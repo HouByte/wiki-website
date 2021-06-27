@@ -1,25 +1,23 @@
 <template>
   <a-layout>
-    <a-layout-header class="header">
-
-      <a-menu
-        theme="dark"
-        mode="horizontal"
-        v-model:selectedKeys="selectedKeys1"
-        :style="{ lineHeight: '64px' }"
-      >
-        <a-menu-item key="0" disabled = true>八鸽栈 - Bugio</a-menu-item>
-        <a-menu-item key="1"><router-link to="/">首页</router-link></a-menu-item>
-        <a-menu-item key="2"><router-link to="/wiki">知识库</router-link></a-menu-item>
-        <a-menu-item key="3"><router-link to="/about">关于作者</router-link></a-menu-item>
-      </a-menu>
-    </a-layout-header>
+    <the-header></the-header>
     <router-view/>
-    <a-layout-footer style="position:absolute;bottom: 10px;margin: auto;left: 0;right: 0;text-align: center">
-                    八鸽栈 Bugio © 2021 Vincent Vic <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2020019789-1号</a>
-                  </a-layout-footer>
+    <the-footer></the-footer>
   </a-layout>
 </template>
+
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import TheHeader from '@/components/the-header.vue'; // @ is an alias to /src
+import TheFooter from '@/components/the-footer.vue';
+export default defineComponent({
+  name: 'app',
+  components: {
+    TheHeader,TheFooter
+  },
+});
+</script>
 
 <style>
 
