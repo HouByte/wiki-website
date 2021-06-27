@@ -6,9 +6,9 @@
       WARNING - @mbg.generated
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="`name`" jdbcType="VARCHAR" property="name" />
     <result column="category_ids" jdbcType="VARCHAR" property="categoryIds" />
-    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="`desc`" jdbcType="VARCHAR" property="desc" />
     <result column="cover" jdbcType="VARCHAR" property="cover" />
     <result column="doc_count" jdbcType="INTEGER" property="docCount" />
     <result column="view_count" jdbcType="INTEGER" property="viewCount" />

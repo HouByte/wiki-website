@@ -1,39 +1,36 @@
-package cn.bugio.wiki.domain.entity;
-
-import java.util.Date;
-import javax.persistence.*;
+package cn.bugio.wiki.domain.dto;
 
 import lombok.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "ebook")
-public class Ebook {
+public class EbookReq {
     /**
      * id
      */
-    @Id
-    @GeneratedValue(generator = "JDBC")
     private Long id;
 
     /**
      * 名称
      */
-    @Column(name = "`name`")
     private String name;
 
     /**
      * 分类列表，逗号隔开
      */
-    @Column(name = "category_ids")
     private String categoryIds;
 
     /**
      * 描述
      */
-    @Column(name = "`desc`")
     private String desc;
 
     /**
@@ -44,19 +41,16 @@ public class Ebook {
     /**
      * 文档数
      */
-    @Column(name = "doc_count")
     private Integer docCount;
 
     /**
      * 页面数
      */
-    @Column(name = "view_count")
     private Integer viewCount;
 
     /**
      * 点赞数
      */
-    @Column(name = "vote_count")
     private Integer voteCount;
 
     /**
