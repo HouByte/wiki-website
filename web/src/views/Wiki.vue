@@ -116,7 +116,7 @@ export default defineComponent({
     const ebooks =ref();
     onMounted(()=>{
 
-      axios.post("http://localhost:8777/ebook/list").then((res) =>{
+      axios.post("/ebook/list").then((res) =>{
         const data = res.data;
         if (data.code === 0){
 
