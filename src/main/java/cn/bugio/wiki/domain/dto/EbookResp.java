@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,9 +25,9 @@ public class EbookResp {
     private String name;
 
     /**
-     * 分类列表，逗号隔开
+     * 分类列表
      */
-    private String categoryIds;
+    private List<String> categoryIdList;
 
     /**
      * 描述

@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -50,7 +53,19 @@ public class EbookServiceImpl implements EbookService {
         if (ebooks == null){
             return CommonResult.success("没有书籍");
         }
-        List<EbookResp> ebookResps = CopyUtil.copyList(ebooks, EbookResp.class);
+        List<EbookResp> ebookResps = new LinkedList<>();
+        for (Ebook ebook : ebooks) {
+            EbookResp ebookResp = CopyUtil.copy(ebook, EbookResp.class);
+            String categoryIds = ebook.getCategoryIds();
+            if (StringUtils.isNotEmpty(categoryIds)){
+                String[] split = categoryIds.split(",");
+                List<String> categoryIdList = Arrays.asList(split);
+                ebookResp.setCategoryIdList(categoryIdList);
+                ebookResps.add(ebookResp);
+            }
+        }
+         ebookResps = CopyUtil.copyList(ebooks, EbookResp.class);
         return CommonResult.success(ebookResps);
     }
+
 }
