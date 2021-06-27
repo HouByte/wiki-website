@@ -1,19 +1,26 @@
 <template>
-  <div class="home">
-  <a-button type="danger">Danger</a-button>
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+  <a-carousel autoplay style="height: 360px">
+    <img src="http://s.bugio.cn/img/1.jpg" />
+    <img src="http://s.bugio.cn/img/2.jpg" />
+    <img src="http://s.bugio.cn/img/3.jpg" />
+    <img src="http://s.bugio.cn/img/4.jpg" />
+  </a-carousel>
+
+
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
-export default defineComponent({
-  name: 'Home',
-  components: {
-    HelloWorld,
-  },
-});
-</script>
+<style scoped>
+/* For demo */
+.ant-carousel :deep(.slick-slide) {
+  text-align: center;
+  height: 360px;
+  line-height: 360px;
+  background: #364d79;
+  overflow: hidden;
+}
+
+.ant-carousel :deep(.slick-slide h3) {
+  color: #fff;
+}
+</style>
