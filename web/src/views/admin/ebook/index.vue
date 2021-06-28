@@ -74,7 +74,7 @@
         </template>
         <template #action>
       <span>
-        <a-button type="primary">添加</a-button>
+        <a-button type="primary" style="margin-right: 10px;">添加</a-button>
         <a-button type="primary">删除</a-button>
 
       </span>
