@@ -78,8 +78,8 @@
 
 <script lang="ts">
 import { defineComponent,onMounted,ref} from 'vue';
-import axios from 'axios';
-import { notification } from 'ant-design-vue';
+import {ebookList} from "@/api/ebook";
+import { message } from 'ant-design-vue';
 import { StarOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
 
 
@@ -106,27 +106,20 @@ export default defineComponent({
   },
   setup(){
     console.log("setup");
-    const openNotificationWithIcon = (type: string,msg: string) => {
-      notification[type]({
-        message: type,
-        description:msg,
-      });
-    };
 
     const ebooks =ref();
     onMounted(()=>{
+      ebookList().then((res) =>{
+          const data = res.data;
+          if (data.code === 0){
+            ebooks.value = data.data;
+            console.log(ebooks);
+            message.success(data.msg);
+          } else {
+            message.error(data.msg);
+          }
 
-      axios.post("/ebook/list").then((res) =>{
-        const data = res.data;
-        if (data.code === 0){
-
-          ebooks.value = data.data;
-          console.log(ebooks);
-        } else {
-          openNotificationWithIcon('error',data.msg);
-        }
-
-      })
+        })
     })
 
     const pagination = {
@@ -142,7 +135,7 @@ export default defineComponent({
     ];
 
     return {
-      openNotificationWithIcon,ebooks,listData,
+      ebooks,listData,
       pagination,
       actions,
     };
