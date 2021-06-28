@@ -72,16 +72,11 @@
         <template #cover="{text}" >
           <img  :src="text" :width="70" :height="70"/>
         </template>
-        <template #action="{ record }">
+        <template #action>
       <span>
-        <a>Invite 一 {{ record.name }}</a>
-        <a-divider type="vertical"/>
-        <a>Delete</a>
-        <a-divider type="vertical"/>
-        <a class="ant-dropdown-link">
-          More actions
-          <down-outlined/>
-        </a>
+        <a-button type="primary">添加</a-button>
+        <a-button type="primary">删除</a-button>
+
       </span>
         </template>
       </a-table>
@@ -192,7 +187,6 @@ export default defineComponent({
   },
   components: {
 
-    DownOutlined,
   },
 });
 </script>
