@@ -64,7 +64,6 @@ public class EbookServiceImpl implements EbookService {
                 ebookResps.add(ebookResp);
             }
         }
-         ebookResps = CopyUtil.copyList(ebooks, EbookResp.class);
         return CommonResult.success(ebookResps);
     }
 

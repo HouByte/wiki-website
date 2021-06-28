@@ -11,7 +11,7 @@
         <a-sub-menu key="sub1">
           <template #title>
               <span>
-                <user-outlined />
+                <user-outlined/>
                 subnav 1
               </span>
           </template>
@@ -23,7 +23,7 @@
         <a-sub-menu key="sub2">
           <template #title>
               <span>
-                <laptop-outlined />
+                <laptop-outlined/>
                 subnav 2
               </span>
           </template>
@@ -35,7 +35,7 @@
         <a-sub-menu key="sub3">
           <template #title>
               <span>
-                <notification-outlined />
+                <notification-outlined/>
                 subnav 3
               </span>
           </template>
@@ -49,14 +49,14 @@
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
-      <a-table :columns="columns" :data-source="data" :loading="Loading">
+      <a-table :columns="columns" :data-source="ebooks" :pagination="pagination" :loading="Loading" >
         <template #name="{ text }">
           <a>{{ text }}</a>
         </template>
         <template #customTitle>
-      <span>
-        电子书名称
-      </span>
+          <span>
+            电子书名称
+          </span>
         </template>
         <template #categoryIdList="{ text: categoryIdList }">
       <span>
@@ -69,15 +69,18 @@
         </a-tag>
       </span>
         </template>
+        <template #cover="{text}" >
+          <img  :src="text" :width="70" :height="70"/>
+        </template>
         <template #action="{ record }">
       <span>
         <a>Invite 一 {{ record.name }}</a>
-        <a-divider type="vertical" />
+        <a-divider type="vertical"/>
         <a>Delete</a>
-        <a-divider type="vertical" />
+        <a-divider type="vertical"/>
         <a class="ant-dropdown-link">
           More actions
-          <down-outlined />
+          <down-outlined/>
         </a>
       </span>
         </template>
@@ -89,13 +92,16 @@
 
 
 <script lang="ts">
-import {  DownOutlined } from '@ant-design/icons-vue';
-import { defineComponent } from 'vue';
+import {DownOutlined} from '@ant-design/icons-vue';
+import {defineComponent, onMounted, ref} from 'vue';
+import {ebookList} from "@/api/ebook";
+import {message} from "ant-design-vue";
+import moment from 'moment'
 const columns = [
   {
     dataIndex: 'name',
     key: 'name',
-    slots: { title: 'customTitle', customRender: 'name' },
+    slots: {title: 'customTitle', customRender: 'name'},
   },
   {
     title: '描述',
@@ -106,12 +112,13 @@ const columns = [
     title: '分类',
     key: 'categoryIdList',
     dataIndex: 'categoryIdList',
-    slots: { customRender: 'categoryIdList' },
+    slots: {customRender: 'categoryIdList'},
   },
   {
     title: '封面',
     dataIndex: 'cover',
     key: 'cover',
+    slots: {customRender: 'cover'},
   },
   {
     title: '文档数',
@@ -132,55 +139,55 @@ const columns = [
     title: '创建时间',
     dataIndex: 'created',
     key: 'created',
+    customRender: function (val:any) {
+      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : ''
+    }
   },
   {
     title: '更新时间',
     dataIndex: 'updated',
     key: 'updated',
+    // 时间格式化, 需要引入moment组件
+    customRender: function (val:any) {
+      return val ? moment(val).format('YYYY-MM-DD HH:mm:ss') : ''
+    }
   },
   {
     title: 'Action',
     key: 'action',
-    slots: { customRender: 'action' },
+    slots: {customRender: 'action'},
   },
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    desc:"xxxxx",
-    address: 'New York No. 1 Lake Park',
-    categoryIdList: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    desc:"xxxxx",
-    address: 'London No. 1 Lake Park',
-    categoryIdList: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    desc:"xxxxx",
-    address: 'Sidney No. 1 Lake Park',
-    categoryIdList: ['cool', 'teacher'],
-  },
-];
 
 const Loading = false;
 
 export default defineComponent({
   setup() {
+    const ebooks = ref();
+    onMounted(() => {
+      ebookList().then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          ebooks.value = data.data;
+          console.log(ebooks);
+        } else {
+          message.error(data.msg);
+        }
 
+      })
+    })
+    const pagination = {
+      onChange: (page: number) => {
+        console.log(page);
+      },
+      pageSize: 10,
+    };
     return {
-      data,
+      ebooks,
       columns,
       Loading,
+      pagination
     };
   },
   components: {

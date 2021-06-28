@@ -114,7 +114,6 @@ export default defineComponent({
           if (data.code === 0){
             ebooks.value = data.data;
             console.log(ebooks);
-            message.success(data.msg);
           } else {
             message.error(data.msg);
           }
