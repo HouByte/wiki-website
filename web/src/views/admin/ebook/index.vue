@@ -72,9 +72,9 @@
         <template #cover="{text}" >
           <img  :src="text" :width="70" :height="70"/>
         </template>
-        <template #action>
+        <template #action="{ record }">
       <span>
-        <a-button type="primary" style="margin-right: 10px;">添加</a-button>
+        <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">添加</a-button>
         <a-button type="primary">删除</a-button>
 
       </span>
@@ -83,15 +83,47 @@
     </a-layout-content>
 
   </a-layout>
+
+  <a-modal v-model:visible="visible" title="添加电子书" @ok="handleEditOk">
+    <a-form :model="curEbook" :label-col="{span:4}" :wrapper-col="wrapperCol">
+      <a-form-item label="封面">
+        <a-input v-model:value="curEbook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="curEbook.name" />
+      </a-form-item>
+      <a-form-item label="分类">
+        <a-select
+            v-model:value="curEbook.categoryIdList"
+            mode="tags"
+            style="min-width: 200px;max-width: 300px;"
+            :token-separators="[',']"
+            @change="handleChange"
+        >
+          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
+           xxx {{ (i + 9).toString(36) + i }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+
+      <a-form-item label="描述">
+        <a-input v-model:value="curEbook.desc" type="textarea" />
+      </a-form-item>
+
+    </a-form>
+  </a-modal>
 </template>
 
 
 <script lang="ts">
 import {DownOutlined} from '@ant-design/icons-vue';
-import {defineComponent, onMounted, ref} from 'vue';
-import {ebookList} from "@/api/ebook";
+import {defineComponent, onMounted, ref,reactive, toRaw, UnwrapRef} from 'vue';
+import {ebookList,ebookSave} from "@/api/ebook";
 import {message} from "ant-design-vue";
 import moment from 'moment'
+import { Moment } from 'moment';
+import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
+
 const columns = [
   {
     dataIndex: 'name',
@@ -153,24 +185,32 @@ const columns = [
     slots: {customRender: 'action'},
   },
 ];
-
-
-const Loading = false;
+const Loading = ref();
+const ebooks = ref();
+const getList = () => {
+  ebookList().then((res) => {
+    const data = res.data;
+    if (data.code === 0) {
+      ebooks.value = data.data;
+      console.log(ebooks);
+    } else {
+      message.error(data.msg);
+    }
+    Loading.value = false;
+  })
+}
 
 export default defineComponent({
-  setup() {
-    const ebooks = ref();
-    onMounted(() => {
-      ebookList().then((res) => {
-        const data = res.data;
-        if (data.code === 0) {
-          ebooks.value = data.data;
-          console.log(ebooks);
-        } else {
-          message.error(data.msg);
-        }
+  components: {
 
-      })
+  },
+  setup() {
+
+    Loading.value = true;
+
+    onMounted(() => {
+      console.log("x")
+      getList();
     })
     const pagination = {
       onChange: (page: number) => {
@@ -178,15 +218,56 @@ export default defineComponent({
       },
       pageSize: 10,
     };
+    const visible = ref<boolean>(false);
+
+    const showEdit = (ebook:any) => {
+      visible.value = true;
+      curEbook.value = ebook
+    };
+
+    const handleEditOk = (e: MouseEvent) => {
+      console.log(e);
+      visible.value = false;
+      console.log('submit!', toRaw(curEbook));
+      console.log("保存",curEbook.value)
+      ebookSave(curEbook.value).then((res) => {
+
+        const data = res.data;
+        if (data.code === 0) {
+          ebooks.value = data.data;
+          message.success(data.msg);
+        } else {
+          message.error(data.msg);
+        }
+        getList();
+        Loading.value = false;
+      })
+    };
+
+
+
+    // const handleChange = (value: string) => {
+    //   console.log(`selected ${value}`);
+    // };
+
+    //编辑 弹出窗口
+    const curEbook = ref();
+
+
+
     return {
       ebooks,
       columns,
       Loading,
-      pagination
+      pagination,
+      visible,
+      showEdit,
+      handleEditOk,
+      curEbook,
+      getList,
+      value: ref<string[]>([]),
     };
   },
-  components: {
 
-  },
 });
 </script>

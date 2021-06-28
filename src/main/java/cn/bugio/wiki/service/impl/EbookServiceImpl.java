@@ -2,6 +2,7 @@ package cn.bugio.wiki.service.impl;
 
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.dao.EbookMapper;
+import cn.bugio.wiki.domain.dto.EbookReq;
 import cn.bugio.wiki.domain.dto.EbookResp;
 import cn.bugio.wiki.domain.entity.Ebook;
 import cn.bugio.wiki.service.EbookService;
@@ -65,6 +66,34 @@ public class EbookServiceImpl implements EbookService {
             }
         }
         return CommonResult.success(ebookResps);
+    }
+
+    /**
+     * 保存电子书
+     *
+     * @param ebookReq 保存数据
+     * @return
+     */
+    @Override
+    public CommonResult save(EbookReq ebookReq) {
+        System.out.println(ebookReq);
+        if (ebookReq == null){
+            return CommonResult.error("参数不能为空");
+        }
+        Ebook ebook = CopyUtil.copy(ebookReq, Ebook.class);
+        String categoryids = ebookReq.getCategoryIdList().toString().replace("[","").replace("]","");
+        ebook.setCategoryIds(categoryids);
+        int op = 0;
+        //id为空为新增
+        if (ebook.getId() == null){
+            op = ebookMapper.insertSelective(ebook);
+        } else{
+            op = ebookMapper.updateByPrimaryKeySelective(ebook);
+        }
+        if (op == 0){
+            return CommonResult.error("保存失败");
+        }
+        return CommonResult.success("保存成功");
     }
 
 }

@@ -1,10 +1,12 @@
 package cn.bugio.wiki.controller;
 
 import cn.bugio.wiki.common.CommonResult;
+import cn.bugio.wiki.domain.dto.EbookReq;
 import cn.bugio.wiki.domain.dto.EbookResp;
 import cn.bugio.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +33,10 @@ public class EbookController {
     @PostMapping("list")
     public CommonResult<List<EbookResp>> list(String keyword){
         return ebookService.list(keyword);
+    }
+
+    @PostMapping("save")
+    public CommonResult save(@RequestBody EbookReq ebookReq){
+        return ebookService.save(ebookReq);
     }
 }
