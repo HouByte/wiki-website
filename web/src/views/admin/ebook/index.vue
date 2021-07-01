@@ -49,6 +49,9 @@
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
+      <p>
+        <a-button type="primary" style="margin-right: 10px;" @click="showAdd">添加</a-button>
+      </p>
       <a-table :columns="columns" :data-source="ebooks" :pagination="pagination" :loading="Loading" >
         <template #name="{ text }">
           <a>{{ text }}</a>
@@ -74,7 +77,7 @@
         </template>
         <template #action="{ record }">
       <span>
-        <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">添加</a-button>
+        <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">编辑</a-button>
         <a-button type="primary">删除</a-button>
 
       </span>
@@ -84,7 +87,7 @@
 
   </a-layout>
 
-  <a-modal v-model:visible="visible" title="添加电子书" @ok="handleEditOk">
+  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
     <a-form :model="curEbook" :label-col="{span:4}" :wrapper-col="wrapperCol">
       <a-form-item label="封面">
         <a-input v-model:value="curEbook.cover" />
@@ -100,8 +103,8 @@
             :token-separators="[',']"
             @change="handleChange"
         >
-          <a-select-option v-for="i in 25" :key="(i + 9).toString(36) + i">
-           xxx {{ (i + 9).toString(36) + i }}
+          <a-select-option v-for="i in 25" :key="i">
+            {{ i }}
           </a-select-option>
         </a-select>
       </a-form-item>
@@ -219,19 +222,25 @@ export default defineComponent({
       pageSize: 10,
     };
     const visible = ref<boolean>(false);
-
+    const modalTitle = ref();
+    //编辑 弹出窗口
+    const curEbook = ref();
     const showEdit = (ebook:any) => {
       visible.value = true;
-      curEbook.value = ebook
+      curEbook.value = ebook;
+      modalTitle.value = "编辑";
     };
 
-    const handleEditOk = (e: MouseEvent) => {
-      console.log(e);
-      visible.value = false;
-      console.log('submit!', toRaw(curEbook));
-      console.log("保存",curEbook.value)
-      ebookSave(curEbook.value).then((res) => {
+    const showAdd = () => {
+      visible.value = true;
+      curEbook.value = {};
+      modalTitle.value = '添加';
+    }
 
+    const handleEditOk = (e: MouseEvent) => {
+      visible.value = false;
+      console.log("保存/更新",curEbook.value)
+      ebookSave(curEbook.value).then((res) => {
         const data = res.data;
         if (data.code === 0) {
           ebooks.value = data.data;
@@ -242,6 +251,7 @@ export default defineComponent({
         getList();
         Loading.value = false;
       })
+
     };
 
 
@@ -250,8 +260,7 @@ export default defineComponent({
     //   console.log(`selected ${value}`);
     // };
 
-    //编辑 弹出窗口
-    const curEbook = ref();
+
 
 
 
@@ -263,6 +272,8 @@ export default defineComponent({
       visible,
       showEdit,
       handleEditOk,
+      showAdd,
+      modalTitle,
       curEbook,
       getList,
       value: ref<string[]>([]),

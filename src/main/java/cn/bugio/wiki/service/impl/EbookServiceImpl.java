@@ -7,13 +7,14 @@ import cn.bugio.wiki.domain.dto.EbookResp;
 import cn.bugio.wiki.domain.entity.Ebook;
 import cn.bugio.wiki.service.EbookService;
 import cn.bugio.wiki.util.CopyUtil;
+import cn.bugio.wiki.util.SnowFlake;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,9 +30,12 @@ public class EbookServiceImpl implements EbookService {
 
     private final EbookMapper ebookMapper;
 
+    private final SnowFlake snowFlake;
+
     @Autowired
-    public EbookServiceImpl(EbookMapper ebookMapper) {
+    public EbookServiceImpl(EbookMapper ebookMapper, SnowFlake snowFlake) {
         this.ebookMapper = ebookMapper;
+        this.snowFlake = snowFlake;
     }
 
     /**
@@ -86,8 +90,12 @@ public class EbookServiceImpl implements EbookService {
         int op = 0;
         //id为空为新增
         if (ebook.getId() == null){
+            ebook.setId(snowFlake.nextId());
+            ebook.setCreated(new Date());
+            ebook.setUpdated(new Date());
             op = ebookMapper.insertSelective(ebook);
         } else{
+            ebook.setUpdated(new Date());
             op = ebookMapper.updateByPrimaryKeySelective(ebook);
         }
         if (op == 0){
