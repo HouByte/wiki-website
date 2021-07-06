@@ -3,13 +3,12 @@ package cn.bugio.wiki.controller;
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.domain.dto.EbookReq;
 import cn.bugio.wiki.domain.dto.EbookResp;
+import cn.bugio.wiki.domain.dto.EbookSearchReq;
 import cn.bugio.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -31,12 +30,22 @@ public class EbookController {
     }
 
     @PostMapping("list")
-    public CommonResult<List<EbookResp>> list(String keyword){
+    public CommonResult<List<EbookResp>> list(@RequestBody(required = false) EbookSearchReq searchReq){
+        String keyword = null;
+        if (searchReq !=null){
+            keyword = searchReq.getKeyword();
+        }
+        System.out.println(keyword);
         return ebookService.list(keyword);
     }
 
     @PostMapping("save")
-    public CommonResult save(@RequestBody EbookReq ebookReq){
+    public CommonResult save(@Valid @RequestBody EbookReq ebookReq){
         return ebookService.save(ebookReq);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public CommonResult delete(@PathVariable("id") Long id){
+        return ebookService.delete(id);
     }
 }

@@ -49,8 +49,15 @@
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
+
       <p>
-        <a-button type="primary" style="margin-right: 10px;" @click="showAdd">添加</a-button>
+        <a-input-search
+            v-model:value="value"
+            placeholder="书名"
+            style="width: 200px"
+            @search="onSearch"
+        />
+        <a-button type="primary" style="margin-left: 10px;" @click="showAdd">添加</a-button>
       </p>
       <a-table :columns="columns" :data-source="ebooks" :pagination="pagination" :loading="Loading" >
         <template #name="{ text }">
@@ -78,8 +85,15 @@
         <template #action="{ record }">
       <span>
         <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">编辑</a-button>
-        <a-button type="primary">删除</a-button>
 
+        <a-popconfirm
+            title="是否永久删除，存在不可恢复风险"
+            ok-text="是"
+            cancel-text="否"
+            @confirm="handleDelete(record.id)"
+        >
+            <a-button type="primary">删除</a-button>
+          </a-popconfirm>
       </span>
         </template>
       </a-table>
@@ -121,11 +135,12 @@
 <script lang="ts">
 import {DownOutlined} from '@ant-design/icons-vue';
 import {defineComponent, onMounted, ref,reactive, toRaw, UnwrapRef} from 'vue';
-import {ebookList,ebookSave} from "@/api/ebook";
+import {ebookList, ebookSave, ebookDel, ebookSearch} from "@/api/ebook";
 import {message} from "ant-design-vue";
 import moment from 'moment'
 import { Moment } from 'moment';
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
+import {Tool} from "@/util/tool";
 
 const columns = [
   {
@@ -211,23 +226,39 @@ export default defineComponent({
 
     Loading.value = true;
 
+    //启动执行
     onMounted(() => {
       console.log("x")
       getList();
     })
+    //查询
+    const onSearch = (keyword:any) => {
+      ebookSearch(keyword).then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          ebooks.value = data.data;
+          console.log(ebooks);
+        } else {
+          message.error(data.msg);
+        }
+        Loading.value = false;
+      })
+    }
+    //分页
     const pagination = {
       onChange: (page: number) => {
         console.log(page);
       },
       pageSize: 10,
     };
+    //对话框
     const visible = ref<boolean>(false);
     const modalTitle = ref();
     //编辑 弹出窗口
     const curEbook = ref();
     const showEdit = (ebook:any) => {
       visible.value = true;
-      curEbook.value = ebook;
+      curEbook.value = Tool.copy(ebook);
       modalTitle.value = "编辑";
     };
 
@@ -254,6 +285,19 @@ export default defineComponent({
 
     };
 
+    const  handleDelete = (id:number) => {
+      ebookDel(id).then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          ebooks.value = data.data;
+          message.success(data.msg);
+        } else {
+          message.error(data.msg);
+        }
+        getList();
+        Loading.value = false;
+      })
+    }
 
 
     // const handleChange = (value: string) => {
@@ -266,6 +310,7 @@ export default defineComponent({
 
     return {
       ebooks,
+      onSearch,
       columns,
       Loading,
       pagination,
@@ -273,6 +318,7 @@ export default defineComponent({
       showEdit,
       handleEditOk,
       showAdd,
+      handleDelete,
       modalTitle,
       curEbook,
       getList,

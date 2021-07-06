@@ -52,7 +52,7 @@ public class EbookServiceImpl implements EbookService {
         } else {
             Example example = new Example(Ebook.class);
             keyword = "%"+keyword+"%";
-            example.createCriteria().andEqualTo("name",keyword).orEqualTo("desc",keyword);
+            example.createCriteria().andLike("name",keyword).orLike("desc",keyword);
             ebooks = ebookMapper.selectByExample(example);
         }
         if (ebooks == null){
@@ -80,7 +80,6 @@ public class EbookServiceImpl implements EbookService {
      */
     @Override
     public CommonResult save(EbookReq ebookReq) {
-        System.out.println(ebookReq);
         if (ebookReq == null){
             return CommonResult.error("参数不能为空");
         }
@@ -102,6 +101,21 @@ public class EbookServiceImpl implements EbookService {
             return CommonResult.error("保存失败");
         }
         return CommonResult.success("保存成功");
+    }
+
+    /**
+     * 删除电子书
+     *
+     * @param id 书籍id
+     * @return
+     */
+    @Override
+    public CommonResult delete(Long id) {
+        int delete = ebookMapper.deleteByPrimaryKey(id);
+        if (delete == 0){
+            return CommonResult.error("删除失败");
+        }
+        return CommonResult.success("删除成功");
     }
 
 }

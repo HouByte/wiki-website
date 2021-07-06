@@ -29,4 +29,11 @@ public interface EbookService {
      * @return
      */
     CommonResult save(EbookReq ebookReq);
+
+    /**
+     * 删除电子书
+     * @param id 书籍id
+     * @return
+     */
+    CommonResult delete(Long id);
 }
