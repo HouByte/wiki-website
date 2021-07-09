@@ -45,6 +45,11 @@ public class DocResp {
     private Integer sort;
 
     /**
+     * 内容
+     */
+    private String content;
+
+    /**
      * 阅读数
      */
     @Column(name = "view_count")

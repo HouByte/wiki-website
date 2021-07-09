@@ -20,7 +20,7 @@ import java.util.List;
  * @since: 2021/06/27
  */
 @RestController
-@RequestMapping("doc")
+@RequestMapping("/doc/")
 public class DocController {
 
     private final DocService docService;
@@ -28,6 +28,11 @@ public class DocController {
     @Autowired
     public DocController(DocService docService) {
         this.docService = docService;
+    }
+
+    @PostMapping("query-content/{id}")
+    public CommonResult<String> queryDoc(@PathVariable("id") Long id){
+        return docService.queryContent(id);
     }
 
     @PostMapping("list")

@@ -22,6 +22,15 @@ public interface DocService {
      */
     CommonResult<List<DocResp>> list(String keyword);
 
+
+    /**
+     * <h2>按id查询内容</h2>
+     * @param id id
+     * @return
+     */
+    CommonResult<String> queryContent(Long id);
+
+
     /**
      * 保存电子书
      * @param docReq 保存数据

@@ -42,6 +42,12 @@ public class DocReq {
     private Integer sort;
 
     /**
+     * 内容
+     */
+    @NotNull(message = "内容不能为空")
+    private String content;
+
+    /**
      * 阅读数
      */
     @Column(name = "view_count")

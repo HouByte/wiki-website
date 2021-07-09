@@ -1,9 +1,11 @@
 package cn.bugio.wiki.service.impl;
 
 import cn.bugio.wiki.common.CommonResult;
+import cn.bugio.wiki.dao.ContentMapper;
 import cn.bugio.wiki.dao.DocMapper;
 import cn.bugio.wiki.domain.dto.DocReq;
 import cn.bugio.wiki.domain.dto.DocResp;
+import cn.bugio.wiki.domain.entity.Content;
 import cn.bugio.wiki.domain.entity.Doc;
 import cn.bugio.wiki.service.DocService;
 import cn.bugio.wiki.util.CopyUtil;
@@ -27,11 +29,14 @@ public class DocServiceImpl implements DocService {
 
     private final DocMapper docMapper;
 
+    private final ContentMapper contentMapper;
+
     private final SnowFlake snowFlake;
 
     @Autowired
-    public DocServiceImpl(DocMapper docMapper, SnowFlake snowFlake) {
+    public DocServiceImpl(DocMapper docMapper, ContentMapper contentMapper, SnowFlake snowFlake) {
         this.docMapper = docMapper;
+        this.contentMapper = contentMapper;
         this.snowFlake = snowFlake;
     }
 
@@ -61,6 +66,21 @@ public class DocServiceImpl implements DocService {
     }
 
     /**
+     * <h2>按id查询文档</h2>
+     *
+     * @param id id
+     * @return
+     */
+    @Override
+    public CommonResult<String> queryContent(Long id) {
+        Content content = contentMapper.selectByPrimaryKey(id);
+        if (content == null){
+            return CommonResult.success();
+        }
+        return CommonResult.success("成功",content.getContent());
+    }
+
+    /**
      * 保存电子书
      *
      * @param docReq 保存数据
@@ -72,15 +92,28 @@ public class DocServiceImpl implements DocService {
             return CommonResult.error("参数不能为空");
         }
         Doc doc = CopyUtil.copy(docReq, Doc.class);
+        Content content = Content.builder().id(docReq.getId()).content(docReq.getContent()).build();
         int op = 0;
         //id为空为新增
         if (doc.getId() == null){
             doc.setId(snowFlake.nextId());
             op = docMapper.insertSelective(doc);
+            //如果没有内容就不存
+            if (op > 0 && content.getContent() != null){
+                content.setId(doc.getId());
+                op = contentMapper.insertSelective(content);
+            }
         } else{
             op = docMapper.updateByPrimaryKeySelective(doc);
+            if (op == 0){
+                return CommonResult.error("保存失败");
+            }
+            op = contentMapper.updateByPrimaryKeySelective(content);
+            if (op == 0){
+                op = contentMapper.insertSelective(content);
+            }
         }
-        if (op == 0){
+        if (op == 0 ){
             return CommonResult.error("保存失败");
         }
         return CommonResult.success("保存成功");
@@ -99,6 +132,12 @@ public class DocServiceImpl implements DocService {
         int delete = docMapper.deleteByExample(example);
         if (delete == 0){
             return CommonResult.error("删除失败");
+        }
+        Example contentExample = new Example(Content.class);
+        contentExample.createCriteria().andIn("id",ids);
+        delete = contentMapper.deleteByExample(contentExample);
+        if (delete == 0){
+            return CommonResult.error("删除内容失败");
         }
         return CommonResult.success("删除成功");
     }
