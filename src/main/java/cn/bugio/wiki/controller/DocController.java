@@ -1,6 +1,7 @@
 package cn.bugio.wiki.controller;
 
 import cn.bugio.wiki.common.CommonResult;
+import cn.bugio.wiki.domain.dto.DocDeleteDto;
 import cn.bugio.wiki.domain.dto.DocReq;
 import cn.bugio.wiki.domain.dto.DocResp;
 import cn.bugio.wiki.domain.dto.DocSearchReq;
@@ -43,8 +44,8 @@ public class DocController {
         return docService.save(docReq);
     }
 
-    @DeleteMapping("delete/{id}")
-    public CommonResult delete(@PathVariable("id") Long id){
-        return docService.delete(id);
+    @PostMapping("deletes")
+    public CommonResult deletes(@RequestBody DocDeleteDto docDelete){
+        return docService.deletes(docDelete.getIds());
     }
 }

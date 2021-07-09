@@ -106,6 +106,8 @@ const columns = [
 const Loading = ref();
 const docs = ref();
 const level1 = ref();
+
+
 const getList = () => {
   level1.value = [];
   docList().then((res) => {
@@ -114,7 +116,6 @@ const getList = () => {
       docs.value = data.data;
       level1.value = [];
       level1.value = Tool.array2Tree(docs.value,0);
-      console.log(level1.value);
     } else {
       message.error(data.msg);
     }
@@ -198,13 +199,48 @@ export default defineComponent({
       }
     };
 
+    let deleteIds: Array<number> = [];
+    const deleteNames: Array<string> = [];
+    /**
+     * 查找整根树枝
+     */
+    const getDeleteIds = (data: any, id: any) => {
+      // 遍历数组，即遍历某一层节点
+      for (let i = 0; i < data.length; i++) {
+        const node = data[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          // 将目标ID放入结果集ids
+          // node.disabled = true;
+          deleteIds.push(id);
+          deleteNames.push(node.name);
+          console.log("delete id node  ==> ",id);
+          // 遍历所有子节点
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              getDeleteIds(children, children[j].id)
+            }
+          }
+        } else {
+          // 如果当前节点不是目标节点，则到其子节点再找找看。
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            getDeleteIds(children, id);
+          }
+        }
+      }
+    };
 
-    //表单
-    const treeSelectData = ref();
-    treeSelectData.value = [];
+
+
     //对话框
     const visible = ref<boolean>(false);
     const modalTitle = ref();
+    //表单
+    const treeSelectData = ref();
+    treeSelectData.value = [];
+
     //编辑 弹出窗口
     const curDoc = ref();
     const showEdit = (doc:any) => {
@@ -252,7 +288,9 @@ export default defineComponent({
     };
 
     const  handleDelete = (id:number) => {
-      docDel(id).then((res) => {
+      deleteIds = [];
+      getDeleteIds(level1.value,id)
+      docDel(deleteIds).then((res) => {
         const data = res.data;
         if (data.code === 0) {
           docs.value = data.data;

@@ -89,12 +89,14 @@ public class DocServiceImpl implements DocService {
     /**
      * 删除电子书
      *
-     * @param id 书籍id
+     * @param ids 书籍id
      * @return
      */
     @Override
-    public CommonResult delete(Long id) {
-        int delete = docMapper.deleteByPrimaryKey(id);
+    public CommonResult deletes(List<Long> ids) {
+        Example example = new Example(Doc.class);
+        example.createCriteria().andIn("id",ids);
+        int delete = docMapper.deleteByExample(example);
         if (delete == 0){
             return CommonResult.error("删除失败");
         }

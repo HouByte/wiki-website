@@ -34,5 +34,5 @@ public interface DocService {
      * @param id 书籍id
      * @return
      */
-    CommonResult delete(Long id);
+    CommonResult deletes(List<Long> id);
 }
