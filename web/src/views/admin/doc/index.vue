@@ -42,6 +42,8 @@
       </span>
         </template>
       </a-table>
+
+
     </a-layout-content>
 
   </a-layout>
@@ -67,6 +69,9 @@
       <a-form-item label="排序">
         <a-input v-model:value="curDoc.sort"  />
       </a-form-item>
+      <a-form-item label="内容">
+        <div id="contentEditor"></div>
+      </a-form-item>
 
     </a-form>
   </a-modal>
@@ -81,7 +86,7 @@ import {Tool} from "@/util/tool";
 import TheAdminMenu from '@/components/the-admin-menu.vue';
 import {useRoute} from "vue-router";
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-
+import E from "wangeditor";
 const columns = [
   {
     dataIndex: 'name',
@@ -142,9 +147,11 @@ export default defineComponent({
     console.log("route.meta：", route.meta);
     Loading.value = true;
 
+
     //启动执行
     onMounted(() => {
-      console.log("x")
+
+
       getList();
     })
     //查询
@@ -242,7 +249,10 @@ export default defineComponent({
     const treeSelectData = ref();
     treeSelectData.value = [];
 
+
     //编辑 弹出窗口
+    //富文本编辑器
+    const editor = new E('#contentEditor');
     const curDoc = ref();
     const showEdit = (doc:any) => {
       visible.value = true;
@@ -255,9 +265,15 @@ export default defineComponent({
 
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
+
+      setTimeout(()=>{
+        editor.create();
+      },100)
     };
 
     const showAdd = () => {
+
+
       visible.value = true;
       curDoc.value = {
         ebookId:ebookId,
@@ -269,6 +285,11 @@ export default defineComponent({
 
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
+
+      setTimeout(()=>{
+        editor.create();
+      },100)
+
     }
 
     const handleEditOk = (e: MouseEvent) => {
