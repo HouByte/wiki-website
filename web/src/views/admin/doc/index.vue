@@ -1,33 +1,35 @@
 <template>
   <a-layout style="display: flex;">
 
-    <the-admin-menu/>
+<!--    <the-admin-menu/>-->
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
 
-      <p>
-        <a-input-search
-            v-model:value="value"
-            placeholder="文档名称"
-            style="width: 200px"
-            @search="onSearch"
-        />
-        <a-button type="primary" style="margin-left: 10px;" @click="showAdd">添加</a-button>
-      </p>
-      <a-table :columns="columns" :data-source="level1" :pagination="pagination" :loading="Loading" >
-        <template #name="{ text }">
-          <a>{{ text }}</a>
-        </template>
-        <template #customTitle>
+      <a-row>
+        <a-col :span="6">
+          <p>
+            <a-input-search
+                v-model:value="value"
+                placeholder="文档名称"
+                style="width: 200px"
+                @search="onSearch"
+            />
+            <a-button type="primary" style="margin-left: 10px;" @click="showAdd">添加</a-button>
+          </p>
+          <a-table :columns="columns" :data-source="level1" :pagination="pagination" :loading="Loading" >
+            <template #name="{ text }">
+              <a>{{ text }}</a>
+            </template>
+            <template #customTitle>
           <span>
             文档名称
           </span>
-        </template>
-        <template #cover="{text}" >
-          <img  :src="text" :width="70" :height="70"/>
-        </template>
-        <template #action="{ record }">
+            </template>
+            <template #cover="{text}" >
+              <img  :src="text" :width="70" :height="70"/>
+            </template>
+            <template #action="{ record }">
       <span>
         <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">编辑</a-button>
 
@@ -40,41 +42,71 @@
             <a-button type="primary">删除</a-button>
           </a-popconfirm>
       </span>
-        </template>
-      </a-table>
+            </template>
+          </a-table>
+        </a-col>
+        <a-col :span="18">
+          <a-form :model="curDoc" :label-col="{span:4}" :wrapper-col="wrapperCol">
+            <a-form-item label="名称">
+              <a-input v-model:value="curDoc.name" />
+            </a-form-item>
+            <a-form-item label="父文档">
+              <a-tree-select
+                  v-model:value="curDoc.parent"
+                  style="width: 100%"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  :tree-data="treeSelectData"
+                  placeholder="Please select"
+                  tree-default-expand-all
+                  :replaceFields="{title: 'name',key:'id',value:'id'}"
+              >
+              </a-tree-select>
+            </a-form-item>
+
+            <a-form-item label="排序">
+              <a-input v-model:value="curDoc.sort"  />
+            </a-form-item>
+            <a-form-item label="内容">
+              <div id="contentEditor"></div>
+            </a-form-item>
+
+          </a-form>
+        </a-col>
+      </a-row>
+
 
 
     </a-layout-content>
 
   </a-layout>
 
-  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
-    <a-form :model="curDoc" :label-col="{span:4}" :wrapper-col="wrapperCol">
-      <a-form-item label="名称">
-        <a-input v-model:value="curDoc.name" />
-      </a-form-item>
-      <a-form-item label="父文档">
-        <a-tree-select
-            v-model:value="curDoc.parent"
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="treeSelectData"
-            placeholder="Please select"
-            tree-default-expand-all
-            :replaceFields="{title: 'name',key:'id',value:'id'}"
-        >
-        </a-tree-select>
-      </a-form-item>
+<!--  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">-->
+<!--    <a-form :model="curDoc" :label-col="{span:4}" :wrapper-col="wrapperCol">-->
+<!--      <a-form-item label="名称">-->
+<!--        <a-input v-model:value="curDoc.name" />-->
+<!--      </a-form-item>-->
+<!--      <a-form-item label="父文档">-->
+<!--        <a-tree-select-->
+<!--            v-model:value="curDoc.parent"-->
+<!--            style="width: 100%"-->
+<!--            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"-->
+<!--            :tree-data="treeSelectData"-->
+<!--            placeholder="Please select"-->
+<!--            tree-default-expand-all-->
+<!--            :replaceFields="{title: 'name',key:'id',value:'id'}"-->
+<!--        >-->
+<!--        </a-tree-select>-->
+<!--      </a-form-item>-->
 
-      <a-form-item label="排序">
-        <a-input v-model:value="curDoc.sort"  />
-      </a-form-item>
-      <a-form-item label="内容">
-        <div id="contentEditor"></div>
-      </a-form-item>
+<!--      <a-form-item label="排序">-->
+<!--        <a-input v-model:value="curDoc.sort"  />-->
+<!--      </a-form-item>-->
+<!--      <a-form-item label="内容">-->
+<!--        <div id="contentEditor"></div>-->
+<!--      </a-form-item>-->
 
-    </a-form>
-  </a-modal>
+<!--    </a-form>-->
+<!--  </a-modal>-->
 </template>
 
 
@@ -83,7 +115,7 @@ import {createVNode, defineComponent, onMounted, ref} from 'vue';
 import {docDel, docList, docSave, docSearch} from "@/api/doc";
 import {message, Modal} from "ant-design-vue";
 import {Tool} from "@/util/tool";
-import TheAdminMenu from '@/components/the-admin-menu.vue';
+// import TheAdminMenu from '@/components/the-admin-menu.vue';
 import {useRoute} from "vue-router";
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import E from "wangeditor";
@@ -93,16 +125,16 @@ const columns = [
     key: 'name',
     slots: {title: 'customTitle', customRender: 'name'},
   },
-  {
-    title: '父文档',
-    dataIndex: 'parent',
-    key: 'parent',
-  },
-  {
-    title: '排序',
-    dataIndex: 'sort',
-    key: 'sort',
-  },
+  // {
+  //   title: '父文档',
+  //   dataIndex: 'parent',
+  //   key: 'parent',
+  // },
+  // {
+  //   title: '排序',
+  //   dataIndex: 'sort',
+  //   key: 'sort',
+  // },
   {
     title: 'Action',
     key: 'action',
@@ -112,7 +144,8 @@ const columns = [
 const Loading = ref();
 const docs = ref();
 const level1 = ref();
-
+const treeSelectData = ref();
+treeSelectData.value = [];
 
 const getList = () => {
   level1.value = [];
@@ -122,6 +155,8 @@ const getList = () => {
       docs.value = data.data;
       level1.value = [];
       level1.value = Tool.array2Tree(docs.value,0);
+      // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
+      treeSelectData.value = Tool.copy(level1.value);
     } else {
       message.error(data.msg);
     }
@@ -131,7 +166,7 @@ const getList = () => {
 
 export default defineComponent({
   components: {
-    TheAdminMenu
+    // TheAdminMenu
   },
   setup() {
 
@@ -146,11 +181,13 @@ export default defineComponent({
     console.log("route.name：", route.name);
     console.log("route.meta：", route.meta);
     Loading.value = true;
+    //富文本编辑器
+    const editor = new E('#contentEditor');
 
 
     //启动执行
     onMounted(() => {
-
+      editor.create();
 
       getList();
     })
@@ -246,14 +283,18 @@ export default defineComponent({
     const visible = ref<boolean>(false);
     const modalTitle = ref();
     //表单
-    const treeSelectData = ref();
-    treeSelectData.value = [];
+
 
 
     //编辑 弹出窗口
-    //富文本编辑器
-    const editor = new E('#contentEditor');
+
     const curDoc = ref();
+    curDoc.value = {
+      ebookId:undefined,
+      parent:undefined,
+      name:undefined,
+      sort:undefined
+    };
     const showEdit = (doc:any) => {
       visible.value = true;
       curDoc.value = Tool.copy(doc);
@@ -266,9 +307,9 @@ export default defineComponent({
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
 
-      setTimeout(()=>{
-        editor.create();
-      },100)
+      // setTimeout(()=>{
+      //   editor.create();
+      // },100)
     };
 
     const showAdd = () => {
@@ -286,9 +327,9 @@ export default defineComponent({
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
 
-      setTimeout(()=>{
-        editor.create();
-      },100)
+      // setTimeout(()=>{
+      //   editor.create();
+      // },100)
 
     }
 
