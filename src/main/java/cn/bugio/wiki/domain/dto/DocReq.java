@@ -1,42 +1,45 @@
-package cn.bugio.wiki.domain.entity;
-
-import javax.persistence.*;
+package cn.bugio.wiki.domain.dto;
 
 import lombok.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "doc")
-public class Doc {
+public class DocReq {
     /**
      * id
      */
-    @Id
-    @GeneratedValue(generator = "JDBC")
     private Long id;
 
     /**
      *  电子书id
      */
-    @Column(name = "ebook_id")
+    @NotNull(message = "电子书对应不能为空")
     private Long ebookId;
 
     /**
      *  父id 
      */
+    @NotNull(message = "父文档不能为空")
     private Long parent;
 
     /**
      *  名称
      */
-    @Column(name = "`name`")
+    @NotNull(message = "名称不能为空")
     private String name;
 
     /**
      *  顺序
      */
+    @NotNull(message = "顺序不能为空")
     private Integer sort;
 
     /**

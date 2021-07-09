@@ -1,15 +1,21 @@
-package cn.bugio.wiki.domain.entity;
+package cn.bugio.wiki.domain.dto;
 
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Table(name = "doc")
-public class Doc {
+public class DocResp {
     /**
      * id
      */
@@ -31,7 +37,6 @@ public class Doc {
     /**
      *  名称
      */
-    @Column(name = "`name`")
     private String name;
 
     /**
