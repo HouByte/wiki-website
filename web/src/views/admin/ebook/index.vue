@@ -1,51 +1,7 @@
 <template>
   <a-layout style="display: flex;">
 
-    <a-layout-sider>
-      <a-menu
-          mode="inline"
-          v-model:selectedKeys="selectedKeys2"
-          v-model:openKeys="openKeys"
-          :style="{ height: '100%', borderRight: 0 }"
-      >
-        <a-sub-menu key="sub1">
-          <template #title>
-              <span>
-                <user-outlined/>
-                subnav 1
-              </span>
-          </template>
-          <a-menu-item key="1">option1</a-menu-item>
-          <a-menu-item key="2">option2</a-menu-item>
-          <a-menu-item key="3">option3</a-menu-item>
-          <a-menu-item key="4">option4</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub2">
-          <template #title>
-              <span>
-                <laptop-outlined/>
-                subnav 2
-              </span>
-          </template>
-          <a-menu-item key="5">option5</a-menu-item>
-          <a-menu-item key="6">option6</a-menu-item>
-          <a-menu-item key="7">option7</a-menu-item>
-          <a-menu-item key="8">option8</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub3">
-          <template #title>
-              <span>
-                <notification-outlined/>
-                subnav 3
-              </span>
-          </template>
-          <a-menu-item key="9">option9</a-menu-item>
-          <a-menu-item key="10">option10</a-menu-item>
-          <a-menu-item key="11">option11</a-menu-item>
-          <a-menu-item key="12">option12</a-menu-item>
-        </a-sub-menu>
-      </a-menu>
-    </a-layout-sider>
+    <the-admin-menu/>
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
@@ -73,10 +29,12 @@
         <a-tag
             v-for="tag in categoryIdList"
             :key="tag"
+            :v-if="tag !== null"
             :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
         >
-          {{ tag.toUpperCase() }}
+          {{ getCategoryName(tag) }}
         </a-tag>
+
       </span>
         </template>
         <template #cover="{text}" >
@@ -110,17 +68,7 @@
         <a-input v-model:value="curEbook.name" />
       </a-form-item>
       <a-form-item label="分类">
-        <a-select
-            v-model:value="curEbook.categoryIdList"
-            mode="tags"
-            style="min-width: 200px;max-width: 300px;"
-            :token-separators="[',']"
-            @change="handleChange"
-        >
-          <a-select-option v-for="i in 25" :key="i">
-            {{ i }}
-          </a-select-option>
-        </a-select>
+        <a-cascader v-model:value="curEbook.categoryIdList" :options="categorys" :field-names="{label:'name',value:'id',children:'children'}" placeholder="Please select" />
       </a-form-item>
 
       <a-form-item label="描述">
@@ -133,15 +81,13 @@
 
 
 <script lang="ts">
-import {DownOutlined} from '@ant-design/icons-vue';
-import {defineComponent, onMounted, ref,reactive, toRaw, UnwrapRef} from 'vue';
-import {ebookList, ebookSave, ebookDel, ebookSearch} from "@/api/ebook";
+import {defineComponent, onMounted, ref} from 'vue';
+import {ebookDel, ebookList, ebookSave, ebookSearch} from "@/api/ebook";
 import {message} from "ant-design-vue";
 import moment from 'moment'
-import { Moment } from 'moment';
-import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
 import {Tool} from "@/util/tool";
-
+import TheAdminMenu from '@/components/the-admin-menu.vue';
+import {categoryList} from "@/api/category";
 const columns = [
   {
     dataIndex: 'name',
@@ -206,6 +152,8 @@ const columns = [
 const Loading = ref();
 const ebooks = ref();
 const getList = () => {
+  // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
+  ebooks.value = [];
   ebookList().then((res) => {
     const data = res.data;
     if (data.code === 0) {
@@ -218,22 +166,54 @@ const getList = () => {
   })
 }
 
+
+
 export default defineComponent({
   components: {
-
+    TheAdminMenu
   },
   setup() {
 
     Loading.value = true;
+    const categorys = ref();
+    let categoryIds:any;
+    const getCategorysList = () => {
+      categoryList().then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          categoryIds = data.data;
+          categorys.value = [];
+          categorys.value = Tool.array2Tree(categoryIds,0);
+          console.log(categorys.value);
+        } else {
+          message.error(data.msg);
+        }
+        Loading.value = false;
+      })
+    }
+
+    const getCategoryName = (cid: number) => {
+      // console.log(cid)
+      let result = "";
+      categoryIds.forEach((item: any) => {
+        if (item.id === cid) {
+          // return item.name; // 注意，这里直接return不起作用
+          result = item.name;
+        }
+      });
+      return result;
+    };
 
     //启动执行
     onMounted(() => {
       console.log("x")
       getList();
+      getCategorysList();
+      console.log("fl ",categorys)
     })
     //查询
     const onSearch = (keyword:any) => {
-      ebookSearch(keyword).then((res) => {
+      ebookSearch(keyword,0).then((res) => {
         const data = res.data;
         if (data.code === 0) {
           ebooks.value = data.data;
@@ -260,6 +240,7 @@ export default defineComponent({
       visible.value = true;
       curEbook.value = Tool.copy(ebook);
       modalTitle.value = "编辑";
+      console.log("当前选择书籍 ",curEbook)
     };
 
     const showAdd = () => {
@@ -322,6 +303,8 @@ export default defineComponent({
       modalTitle,
       curEbook,
       getList,
+      categorys,
+      getCategoryName,
       value: ref<string[]>([]),
     };
   },

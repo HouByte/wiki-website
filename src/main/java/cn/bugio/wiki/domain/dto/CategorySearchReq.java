@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EbookSearchReq {
+public class CategorySearchReq {
 
     private String keyword;
-
-    private Long categoryId;
 }

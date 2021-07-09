@@ -27,7 +27,7 @@ public class EbookResp {
     /**
      * 分类列表
      */
-    private List<String> categoryIdList;
+    private List<Long> categoryIdList;
 
     /**
      * 描述

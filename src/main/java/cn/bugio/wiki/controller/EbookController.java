@@ -31,12 +31,7 @@ public class EbookController {
 
     @PostMapping("list")
     public CommonResult<List<EbookResp>> list(@RequestBody(required = false) EbookSearchReq searchReq){
-        String keyword = null;
-        if (searchReq !=null){
-            keyword = searchReq.getKeyword();
-        }
-        System.out.println(keyword);
-        return ebookService.list(keyword);
+        return ebookService.list(searchReq);
     }
 
     @PostMapping("save")

@@ -4,19 +4,18 @@ import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.dao.EbookMapper;
 import cn.bugio.wiki.domain.dto.EbookReq;
 import cn.bugio.wiki.domain.dto.EbookResp;
+import cn.bugio.wiki.domain.dto.EbookSearchReq;
 import cn.bugio.wiki.domain.entity.Ebook;
 import cn.bugio.wiki.service.EbookService;
 import cn.bugio.wiki.util.CopyUtil;
 import cn.bugio.wiki.util.SnowFlake;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * <h1></h1>
@@ -41,18 +40,25 @@ public class EbookServiceImpl implements EbookService {
     /**
      * <h2>查询列表</h2>
      *
-     * @param keyword 查询关键字 为空全部查询
+     * @param searchReq 查询关键字 为空全部查询
      * @return
      */
     @Override
-    public CommonResult<List<EbookResp>> list(String keyword) {
+    public CommonResult<List<EbookResp>> list(EbookSearchReq searchReq) {
         List<Ebook> ebooks = null;
-        if (StringUtils.isEmpty(keyword)){
+        if (searchReq == null){
             ebooks = ebookMapper.selectAll();
         } else {
             Example example = new Example(Ebook.class);
-            keyword = "%"+keyword+"%";
-            example.createCriteria().andLike("name",keyword).orLike("desc",keyword);
+            if (StringUtils.isNotEmpty(searchReq.getKeyword())){
+                String keyword = searchReq.getKeyword();
+                keyword = "%"+keyword+"%";
+                example.createCriteria().andLike("name",keyword).orLike("desc",keyword);
+            }
+            if (searchReq.getCategoryId() != null && searchReq.getCategoryId() != 0){
+                Long categoryId = searchReq.getCategoryId();
+                example.createCriteria().andLike("categoryIds","%"+categoryId+"%");
+            }
             ebooks = ebookMapper.selectByExample(example);
         }
         if (ebooks == null){
@@ -63,11 +69,13 @@ public class EbookServiceImpl implements EbookService {
             EbookResp ebookResp = CopyUtil.copy(ebook, EbookResp.class);
             String categoryIds = ebook.getCategoryIds();
             if (StringUtils.isNotEmpty(categoryIds)){
-                String[] split = categoryIds.split(",");
-                List<String> categoryIdList = Arrays.asList(split);
+//                String[] split = categoryIds.split(",");
+//                List<String> categoryIdStrList = Arrays.asList(split);
+                List<Long> categoryIdList = JSONObject.parseArray(categoryIds,Long.class);
                 ebookResp.setCategoryIdList(categoryIdList);
-                ebookResps.add(ebookResp);
+
             }
+            ebookResps.add(ebookResp);
         }
         return CommonResult.success(ebookResps);
     }
@@ -84,7 +92,7 @@ public class EbookServiceImpl implements EbookService {
             return CommonResult.error("参数不能为空");
         }
         Ebook ebook = CopyUtil.copy(ebookReq, Ebook.class);
-        String categoryids = ebookReq.getCategoryIdList().toString().replace("[","").replace("]","");
+        String categoryids = JSONObject.toJSONString(ebookReq.getCategoryIdList());//ebookReq.getCategoryIdList().toString().replace("[","").replace("]","");
         ebook.setCategoryIds(categoryids);
         int op = 0;
         //id为空为新增

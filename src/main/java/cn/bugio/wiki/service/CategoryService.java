@@ -1,10 +1,10 @@
 package cn.bugio.wiki.service;
 
 import cn.bugio.wiki.common.CommonResult;
+import cn.bugio.wiki.domain.dto.CategoryReq;
+import cn.bugio.wiki.domain.dto.CategoryResp;
 import cn.bugio.wiki.domain.dto.EbookReq;
 import cn.bugio.wiki.domain.dto.EbookResp;
-import cn.bugio.wiki.domain.dto.EbookSearchReq;
-import cn.bugio.wiki.domain.entity.Ebook;
 
 import java.util.List;
 
@@ -15,21 +15,21 @@ import java.util.List;
  * @author: Vincent Vic
  * @since: 2021/06/27
  */
-public interface EbookService {
+public interface CategoryService {
 
     /**
      * <h2>查询列表</h2>
-     * @param searchReq 查询关键字 为空全部查询
+     * @param keyword 查询关键字 为空全部查询
      * @return
      */
-    CommonResult<List<EbookResp>> list(EbookSearchReq searchReq);
+    CommonResult<List<CategoryResp>> list(String keyword);
 
     /**
      * 保存电子书
-     * @param ebookReq 保存数据
+     * @param categoryReq 保存数据
      * @return
      */
-    CommonResult save(EbookReq ebookReq);
+    CommonResult save(CategoryReq categoryReq);
 
     /**
      * 删除电子书

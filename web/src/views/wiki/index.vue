@@ -7,49 +7,31 @@
           v-model:selectedKeys="selectedKeys2"
           v-model:openKeys="openKeys"
           :style="{ height: '100%', borderRight: 0 }"
+          @click="handleClick"
       >
-        <a-sub-menu key="sub1">
-          <template #title>
-              <span>
-                <user-outlined />
-                subnav 1
-              </span>
-          </template>
-          <a-menu-item key="1">option1</a-menu-item>
-          <a-menu-item key="2">option2</a-menu-item>
-          <a-menu-item key="3">option3</a-menu-item>
-          <a-menu-item key="4">option4</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub2">
+        <a-menu-item key="welcome">
+          <PieChartOutlined />
+          <span>欢迎</span>
+        </a-menu-item>
+        <a-sub-menu v-for="item in level" :key="item.id">
           <template #title>
               <span>
                 <laptop-outlined />
-                subnav 2
+                {{item.name}}
               </span>
           </template>
-          <a-menu-item key="5">option5</a-menu-item>
-          <a-menu-item key="6">option6</a-menu-item>
-          <a-menu-item key="7">option7</a-menu-item>
-          <a-menu-item key="8">option8</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub3">
-          <template #title>
-              <span>
-                <notification-outlined />
-                subnav 3
-              </span>
-          </template>
-          <a-menu-item key="9">option9</a-menu-item>
-          <a-menu-item key="10">option10</a-menu-item>
-          <a-menu-item key="11">option11</a-menu-item>
-          <a-menu-item key="12">option12</a-menu-item>
+          <a-menu-item v-for="child in item.children" :key="child.id">{{ child.name }}</a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
 
     <a-layout-content
         :style="{ background: '#fff',padding: '24px', margin: 0,width:'100%', minHeight: '280px' }">
-      <a-list item-layout="vertical" size="large" :pagination="pagination" :grid="{gutter :20,column:4}"
+
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>欢迎使用Bug IO 知识库</h1>
+      </div>
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :pagination="pagination" :grid="{gutter :20,column:4}"
  :data-source="ebooks">
 
         <template #renderItem="{ item }">
@@ -78,11 +60,14 @@
 
 <script lang="ts">
 import { defineComponent,onMounted,ref} from 'vue';
-import {ebookList} from "@/api/ebook";
+import {ebookList, ebookSearch} from "@/api/ebook";
 import { message } from 'ant-design-vue';
-import { StarOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
+import { StarOutlined,PieChartOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
 
+import {categoryList} from "@/api/category";
+import {Tool} from "@/util/tool";
 
+const Loading = ref();
 const listData: Record<string, string>[] = [];
 
 for (let i = 0; i < 23; i++) {
@@ -103,22 +88,44 @@ export default defineComponent({
     StarOutlined,
     LikeOutlined,
     MessageOutlined,
+    PieChartOutlined,
   },
   setup(){
-    console.log("setup");
 
+    //导航
+    const level = ref();
+    const getCategoryList = () => {
+      categoryList().then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          level.value = [];
+          level.value = Tool.array2Tree(data.data,0);
+          console.log("分类 ",level.value);
+        } else {
+          message.error(data.msg);
+        }
+      })
+    }
+    const getList = (keyword:any,categoryId:number) => {
+      ebookSearch(keyword,categoryId).then((res) =>{
+        const data = res.data;
+        if (data.code === 0){
+          ebooks.value = data.data;
+          console.log(ebooks);
+        } else {
+          message.error(data.msg);
+        }
+        Loading.value = false;
+
+      })
+    }
+
+    const isShowWelcome = ref(true);
     const ebooks =ref();
     onMounted(()=>{
-      ebookList().then((res) =>{
-          const data = res.data;
-          if (data.code === 0){
-            ebooks.value = data.data;
-            console.log(ebooks);
-          } else {
-            message.error(data.msg);
-          }
-
-        })
+      Loading.value = true;
+      getCategoryList();
+      getList(undefined,0);
     })
 
     const pagination = {
@@ -127,6 +134,16 @@ export default defineComponent({
       },
       pageSize: 24,
     };
+
+    let categoryId = 0;
+    //导航栏点击事件
+    const handleClick = (value: any) => {
+      isShowWelcome.value = value.key === "welcome";
+      if (!isShowWelcome.value){
+        categoryId = value.key;
+        getList(undefined,categoryId);
+      }
+    }
     const actions: Record<string, string>[] = [
       { type: 'StarOutlined', text: '156' },
       { type: 'LikeOutlined', text: '156' },
@@ -134,9 +151,12 @@ export default defineComponent({
     ];
 
     return {
+      isShowWelcome,
       ebooks,listData,
       pagination,
       actions,
+      level,
+      handleClick
     };
 
   }
