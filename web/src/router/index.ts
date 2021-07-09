@@ -27,12 +27,12 @@ const routes: Array<RouteRecordRaw> = [
     component: EbookAdmin
   },
   {
-    path: '/admin/category/',
+    path: '/admin/category',
     name: 'CategoryAdmin',
     component: CategoryAdmin
   },
   {
-    path: '/admin/doc/',
+    path: '/admin/doc',
     name: 'DocAdmin',
     component: DocAdmin
   }

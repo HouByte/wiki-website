@@ -79,6 +79,7 @@ import {docDel, docList, docSave, docSearch} from "@/api/doc";
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
 import TheAdminMenu from '@/components/the-admin-menu.vue';
+import {useRoute} from "vue-router";
 
 const columns = [
   {
@@ -127,6 +128,16 @@ export default defineComponent({
   },
   setup() {
 
+    //获取路由参数
+    const route = useRoute();
+    let ebookId = route.query.ebookId;
+    console.log("路由：", route);
+    console.log("route.path：", route.path);
+    console.log("route.query：", route.query);
+    console.log("route.param：", route.params);
+    console.log("route.fullPath：", route.fullPath);
+    console.log("route.name：", route.name);
+    console.log("route.meta：", route.meta);
     Loading.value = true;
 
     //启动执行
@@ -211,7 +222,10 @@ export default defineComponent({
 
     const showAdd = () => {
       visible.value = true;
-      curDoc.value = {};
+      curDoc.value = {
+        ebookId:ebookId,
+        parent:0
+      };
       modalTitle.value = '添加';
 
       treeSelectData.value = Tool.copy(level1.value) || [];

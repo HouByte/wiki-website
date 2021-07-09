@@ -44,7 +44,7 @@
       <span>
         <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">编辑</a-button>
         <a-button type="primary" style="margin-right: 10px;" @click="showEdit(record)">
-          <router-link to = "/admin/doc/">文档管理</router-link>
+          <router-link :to = "'/admin/doc?ebookId='+ record.id" >文档管理</router-link>
         </a-button>
 
         <a-popconfirm
