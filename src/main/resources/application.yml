@@ -2,6 +2,17 @@ server:
   port: 8777
 
 spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 20000
+    client-name: pay
+    jedis:
+      pool:
+        maxIdle: 5000
+        maxWait: 500
+        maxActive: 5000
+        min-idle: 20
   datasource:
     name: catsquare
     url: jdbc:mysql://sql.bugio.cn:28266/bugio_wiki?serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false
@@ -23,3 +34,8 @@ spring:
     poolPreparedStatements: true
     maxPoolPreparedStatementPerConnectionSize: 20
     maxOpenPreparedStatements: 20
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true

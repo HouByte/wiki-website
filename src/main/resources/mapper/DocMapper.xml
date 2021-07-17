@@ -13,4 +13,10 @@
     <result column="view_count" jdbcType="INTEGER" property="viewCount" />
     <result column="vote_count" jdbcType="INTEGER" property="voteCount" />
   </resultMap>
+    <update id="increaseViewCount" parameterType="java.lang.Long">
+      update doc set view_count = view_count + 1 where id = #{id}
+    </update>
+    <update id="increaseVoteCount" parameterType="java.lang.Long">
+      update doc set vote_count = vote_count + 1 where id = #{id}
+    </update>
 </mapper>

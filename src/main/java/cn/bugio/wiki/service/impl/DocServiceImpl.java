@@ -7,8 +7,12 @@ import cn.bugio.wiki.domain.dto.DocReq;
 import cn.bugio.wiki.domain.dto.DocResp;
 import cn.bugio.wiki.domain.entity.Content;
 import cn.bugio.wiki.domain.entity.Doc;
+import cn.bugio.wiki.exception.BusinessException;
+import cn.bugio.wiki.exception.BusinessExceptionCode;
 import cn.bugio.wiki.service.DocService;
 import cn.bugio.wiki.util.CopyUtil;
+import cn.bugio.wiki.util.RedisUtil;
+import cn.bugio.wiki.util.RequestContext;
 import cn.bugio.wiki.util.SnowFlake;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +37,14 @@ public class DocServiceImpl implements DocService {
 
     private final SnowFlake snowFlake;
 
+    private final RedisUtil redisUtil;
+
     @Autowired
-    public DocServiceImpl(DocMapper docMapper, ContentMapper contentMapper, SnowFlake snowFlake) {
+    public DocServiceImpl(DocMapper docMapper, ContentMapper contentMapper, SnowFlake snowFlake, RedisUtil redisUtil) {
         this.docMapper = docMapper;
         this.contentMapper = contentMapper;
         this.snowFlake = snowFlake;
+        this.redisUtil = redisUtil;
     }
 
     /**
@@ -47,16 +54,16 @@ public class DocServiceImpl implements DocService {
      * @return
      */
     @Override
-    public CommonResult<List<DocResp>> list(String keyword) {
+    public CommonResult<List<DocResp>> list(Long ebookId,String keyword) {
         List<Doc> docs = null;
+        Example example = new Example(Doc.class);
+        keyword = "%"+keyword+"%";
+        example.createCriteria().andEqualTo("ebookId",ebookId);
+        example.setOrderByClause("sort asc");
         if (StringUtils.isEmpty(keyword)){
-            docs = docMapper.selectAll();
-        } else {
-            Example example = new Example(Doc.class);
-            keyword = "%"+keyword+"%";
             example.createCriteria().andLike("name",keyword);
-            docs = docMapper.selectByExample(example);
         }
+        docs = docMapper.selectByExample(example);
         if (docs == null){
             return CommonResult.success("没有查询到分类");
         }
@@ -76,6 +83,10 @@ public class DocServiceImpl implements DocService {
         Content content = contentMapper.selectByPrimaryKey(id);
         if (content == null){
             return CommonResult.success();
+        }
+        if (StringUtils.isNotEmpty(content.getContent())){
+            //有内容才更新，todo 迭代计划：一个ip同一个小时访问只算一次阅读
+            docMapper.increaseViewCount(id);
         }
         return CommonResult.success("成功",content.getContent());
     }
@@ -140,6 +151,26 @@ public class DocServiceImpl implements DocService {
             return CommonResult.error("删除内容失败");
         }
         return CommonResult.success("删除成功");
+    }
+
+    /**
+     * 文档点赞
+     *
+     * @param id 文档id
+     * @return
+     */
+    @Override
+    public CommonResult<String> voteDoc(Long id) {
+        String redisKey =String.format("DOC_VOTE_%s_%s",id, RequestContext.getRemoteAddr());
+        //ip+id 作为key,失效12小时
+        if (redisUtil.validateRepeat(redisKey,3600 * 12)){
+            int i = docMapper.increaseVoteCount(id);
+            if (i == 0 ){
+                return CommonResult.error("点赞成功");
+            }
+            return CommonResult.success("点赞成功");
+        }
+        throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.bugio.wiki.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,9 +10,8 @@ import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class RedisUtil {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RedisUtil.class);
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -25,10 +25,10 @@ public class RedisUtil {
      */
     public boolean validateRepeat(String key, long second) {
         if (redisTemplate.hasKey(key)) {
-            LOG.info("key已存在：{}", key);
+            log.info("key已存在：{}", key);
             return false;
         } else {
-            LOG.info("key不存在，放入：{}，过期 {} 秒", key, second);
+            log.info("key不存在，放入：{}，过期 {} 秒", key, second);
             redisTemplate.opsForValue().set(key, key, second, TimeUnit.SECONDS);
             return true;
         }

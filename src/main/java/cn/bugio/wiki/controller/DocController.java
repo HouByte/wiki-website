@@ -35,13 +35,13 @@ public class DocController {
         return docService.queryContent(id);
     }
 
-    @PostMapping("list")
-    public CommonResult<List<DocResp>> list(@RequestBody(required = false) DocSearchReq searchReq){
+    @PostMapping("list/{ebookId}")
+    public CommonResult<List<DocResp>> list(@PathVariable("ebookId") Long ebookId,@RequestBody(required = false) DocSearchReq searchReq){
         String keyword = null;
         if (searchReq !=null){
             keyword = searchReq.getKeyword();
         }
-        return docService.list(keyword);
+        return docService.list(ebookId,keyword);
     }
 
     @PostMapping("save")
@@ -53,4 +53,10 @@ public class DocController {
     public CommonResult deletes(@RequestBody DocDeleteDto docDelete){
         return docService.deletes(docDelete.getIds());
     }
+
+    @PostMapping("vote/{id}")
+    public CommonResult<String> voteDoc(@PathVariable("id") Long id){
+        return docService.voteDoc(id);
+    }
+
 }

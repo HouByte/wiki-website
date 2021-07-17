@@ -16,11 +16,12 @@ import java.util.List;
 public interface DocService {
 
     /**
-     * <h2>查询列表</h2>
+     *  <h2>查询列表</h2>
+     * @param ebookId id
      * @param keyword 查询关键字 为空全部查询
      * @return
      */
-    CommonResult<List<DocResp>> list(String keyword);
+    CommonResult<List<DocResp>> list(Long ebookId,String keyword);
 
 
     /**
@@ -39,9 +40,16 @@ public interface DocService {
     CommonResult save(DocReq docReq);
 
     /**
-     * 删除电子书
-     * @param id 书籍id
+     * 删除文档
+     * @param id 文档id
      * @return
      */
     CommonResult deletes(List<Long> id);
+
+    /**
+     * 文档点赞
+     * @param id 文档id
+     * @return
+     */
+    CommonResult<String> voteDoc(Long id);
 }
