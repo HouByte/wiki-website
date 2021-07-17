@@ -34,4 +34,36 @@
           t1.vote_increase = (t1.vote_count - IFNULL(t2.vote_count,0))
       WHERE  t1.`date`= CURDATE();
     </update>
+  <select id="getStatistic" resultType="cn.bugio.wiki.domain.vo.StatisticResp">
+    SELECT
+      t1.`date` AS `date`,
+      sum( t1.view_count ) AS viewCount,
+      sum( t1.vote_count ) AS voteCount,
+      sum( t1.view_increase ) AS viewIncrease,
+      sum( t1.vote_increase ) AS voteIncrease
+    FROM
+      ebook_snapshot AS t1
+    WHERE
+      t1.`date` >= DATE_SUB( CURDATE(), INTERVAL 1 DAY )
+    GROUP BY
+      t1.`date`
+    ORDER BY
+      t1.`date` ASC;
+  </select>
+
+  <select id="get30Statistic" resultType="cn.bugio.wiki.domain.vo.Statistic30Resp">
+    SELECT
+      t1.`date` AS `date`,
+      SUM(t1.view_increase) AS viewIncrease,
+      SUM(t1.vote_increase) AS voteIncrease
+    FROM
+      ebook_snapshot t1
+    WHERE
+      t1.`date` BETWEEN date_sub(CURDATE(), INTERVAL 30 DAY) and DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    GROUP BY
+      t1.`date`
+    ORDER BY
+      t1.`date` asc;
+  </select>
+
 </mapper>

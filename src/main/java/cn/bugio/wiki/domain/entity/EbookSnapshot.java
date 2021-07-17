@@ -2,13 +2,13 @@ package cn.bugio.wiki.domain.entity;
 
 import java.util.Date;
 import javax.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+import lombok.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
 @Table(name = "ebook_snapshot")
 public class EbookSnapshot {
     /**
