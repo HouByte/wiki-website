@@ -15,7 +15,7 @@ spring:
         min-idle: 20
   datasource:
     name: catsquare
-    url: jdbc:mysql://sql.bugio.cn:28266/bugio_wiki?serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://sql.bugio.cn:28266/bugio_wiki?serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true
     username: bugio_wiki
     password: bugio_wiki_2021
     type: com.alibaba.druid.pool.DruidDataSource

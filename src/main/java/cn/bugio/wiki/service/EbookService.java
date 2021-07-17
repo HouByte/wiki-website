@@ -38,5 +38,5 @@ public interface EbookService {
      */
     CommonResult delete(Long id);
 
-    void updateEbookStatistics();
+    int updateEbookStatistics();
 }

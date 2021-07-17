@@ -13,4 +13,25 @@
     <result column="view_increase" jdbcType="INTEGER" property="viewIncrease" />
     <result column="vote_increase" jdbcType="INTEGER" property="voteIncrease" />
   </resultMap>
+    <update id="genEbookSnapshot">
+      INSERT INTO ebook_snapshot ( ebook_id, `date` )
+      SELECT t1.id,CURDATE() FROM ebook AS t1
+      WHERE NOT EXISTS (
+              SELECT 1 	FROM ebook_snapshot AS t2
+              WHERE t1.id = t2.ebook_id
+                AND t2.`date` = CURDATE()
+        );
+
+      UPDATE ebook_snapshot AS t1,ebook AS t2
+      SET t1.view_count = t2.view_count,
+        t1.vote_count = t2.vote_count
+      WHERE
+        t1.`date` = CURDATE() AND t1.ebook_id = t2.id;
+
+      UPDATE ebook_snapshot AS t1 LEFT JOIN (SELECT ebook_id,view_count,vote_count FROM ebook_snapshot
+        WHERE `date` = DATE_SUB(CURDATE(),INTERVAL 1 DAY)) AS t2  on t1.ebook_id = t2.ebook_id
+        SET t1.view_increase = (t1.view_count - IFNULL(t2.view_count,0)),
+          t1.vote_increase = (t1.vote_count - IFNULL(t2.vote_count,0))
+      WHERE  t1.`date`= CURDATE();
+    </update>
 </mapper>

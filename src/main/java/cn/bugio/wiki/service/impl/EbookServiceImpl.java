@@ -127,8 +127,8 @@ public class EbookServiceImpl implements EbookService {
     }
 
     @Override
-    public void updateEbookStatistics() {
-        ebookMapper.updateEbookStatisticsData();
+    public int updateEbookStatistics() {
+        return ebookMapper.updateEbookStatisticsData();
     }
 
 }
