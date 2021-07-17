@@ -3,7 +3,7 @@
     <a-layout-content :style="{background:'#fff',padding:'24px',margin:0,minHeight:'280px'}">
       <h3 v-show="level1.length === 0">找不到相关文档!</h3>
 
-      <a-row>
+      <a-row v-show="level1.length > 0">
         <a-col :span="6">
           <a-tree
             v-if="level1.length > 0"

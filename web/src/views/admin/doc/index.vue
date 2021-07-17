@@ -9,6 +9,9 @@
       <a-row type="flex" justify="space-between">
         <a-col :span="6">
           <p>
+            <span style="font-size: 24px;">{{eName}}</span>
+          </p>
+          <p>
             <a-input-search
                 v-model:value="value"
                 placeholder="文档名称"
@@ -44,7 +47,7 @@
 
         <a-col :span="18">
           <div v-show="firstLoad">
-            <h1>管理文档</h1>
+            <h1>{{eName}} 文档管理</h1>
           </div>
           <div v-show="!firstLoad">
             <p>
@@ -130,6 +133,8 @@ export default defineComponent({
     //获取路由参数
     const route = useRoute();
     let ebookId = route.query.ebookId;
+    const eName = ref();
+    eName.value = route.query.eName;
     // console.log("路由：", route);
     // console.log("route.path：", route.path);
     // console.log("route.query：", route.query);
@@ -151,7 +156,6 @@ export default defineComponent({
     level1.value = [];
     //查询
     const onSearch = (ebookId:any,keyword:any) => {
-      console.log("ebook id ",ebookId)
       if (ebookId === null){
         return false;
       }
@@ -159,7 +163,6 @@ export default defineComponent({
         const data = res.data;
         if (data.code === 0) {
           docs.value = data.data;
-          console.log(docs);
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value,0);
           // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
@@ -347,6 +350,7 @@ export default defineComponent({
 
     return {
       firstLoad,
+      eName,
       docs,
       onSearch,
       columns,

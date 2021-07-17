@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.bugio.wiki.dao.${project.moduleName}.EbookMapper">
+<mapper namespace="cn.bugio.wiki.dao.EbookMapper">
   <resultMap id="BaseResultMap" type="cn.bugio.wiki.domain.entity.Ebook">
     <!--
       WARNING - @mbg.generated
@@ -16,4 +16,18 @@
     <result column="created" jdbcType="TIMESTAMP" property="created" />
     <result column="updated" jdbcType="TIMESTAMP" property="updated" />
   </resultMap>
+  <update id="updateEbookStatisticsData">
+    UPDATE ebook e,(
+      SELECT
+      ebook_id,
+      COUNT( 1 ) AS doc_count,
+      sum( view_count ) AS view_count,
+      sum( vote_count ) AS vote_count
+      FROM
+      doc
+      GROUP BY ebook_id
+      ) d
+    SET e.doc_count = d.doc_count,e.view_count = d.view_count,e.vote_count = d.vote_count
+    WHERE e.id = d.ebook_id;
+  </update>
 </mapper>

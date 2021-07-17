@@ -126,4 +126,9 @@ public class EbookServiceImpl implements EbookService {
         return CommonResult.success("删除成功");
     }
 
+    @Override
+    public void updateEbookStatistics() {
+        ebookMapper.updateEbookStatisticsData();
+    }
+
 }

@@ -37,10 +37,15 @@
         <template #renderItem="{ item }">
           <a-list-item key="item.id">
             <template #actions>
-          <span v-for="{ type, text } in actions" :key="type">
-            <component v-bind:is="type" style="margin-right: 8px" />
-            {{ text }}
+          <span>
+            <component v-bind:is="'ReadOutlined'" style="margin-left: 12px" />
+            {{ item.viewCount }}
           </span>
+          <span>
+            <component v-bind:is="'LikeOutlined'"  />
+            {{ item.voteCount }}
+          </span>
+
             </template>
 
             <a-list-item-meta :description="item.desc">
@@ -61,9 +66,9 @@
 
 <script lang="ts">
 import { defineComponent,onMounted,ref} from 'vue';
-import {ebookList, ebookSearch} from "@/api/ebook";
+import {ebookSearch} from "@/api/ebook";
 import { message } from 'ant-design-vue';
-import { StarOutlined,PieChartOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
+import { ReadOutlined,PieChartOutlined, LikeOutlined } from '@ant-design/icons-vue';
 
 import {categoryList} from "@/api/category";
 import {Tool} from "@/util/tool";
@@ -86,9 +91,8 @@ for (let i = 0; i < 23; i++) {
 export default defineComponent({
   name: 'app',
   components: {
-    StarOutlined,
+    ReadOutlined,
     LikeOutlined,
-    MessageOutlined,
     PieChartOutlined,
   },
   setup(){
