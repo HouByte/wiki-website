@@ -1,10 +1,7 @@
 package cn.bugio.wiki.controller;
 
 import cn.bugio.wiki.common.CommonResult;
-import cn.bugio.wiki.domain.dto.UserReq;
-import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
-import cn.bugio.wiki.domain.dto.UserResp;
-import cn.bugio.wiki.domain.dto.UserSearchReq;
+import cn.bugio.wiki.domain.dto.*;
 import cn.bugio.wiki.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +33,19 @@ public class UserController {
     }
 
     @PostMapping("save")
-    public CommonResult save(@Valid @RequestBody UserReq userReq){
-        return userService.save(userReq);
+    public CommonResult save(@Valid @RequestBody UserSaveReq userSaveReq){
+        return userService.save(userSaveReq);
     }
+
     @PostMapping("reset-password")
     public CommonResult resetPassword(@Valid @RequestBody UserResetPasswordReq userResetPasswordReq){
         return userService.resetPassword(userResetPasswordReq);
+    }
+
+    @PostMapping("login")
+    public CommonResult login(@Valid @RequestBody UserLoginReq userLoginReq){
+        UserLoginResp login = userService.login(userLoginReq);
+        return CommonResult.success(login);
     }
 
     @DeleteMapping("delete/{id}")

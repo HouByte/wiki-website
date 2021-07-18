@@ -14,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
-public class UserReq {
+public class UserSaveReq {
     /**
      *  ID
      */

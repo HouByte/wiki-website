@@ -12,20 +12,88 @@
       <a-menu-item key="wiki"><router-link to="/wiki">知识库</router-link></a-menu-item>
       <a-menu-item key="admin-ebook"><router-link to="/admin/statistics/">后台管理</router-link></a-menu-item>
       <a-menu-item key="about"><router-link to="/about">关于作者</router-link></a-menu-item>
+
+      <a-button ghost class="login-menu" @click="loginModalVisible = true">登入</a-button>
     </a-menu>
+
+    <a-modal  width="380px" v-model:visible="loginModalVisible" title="欢迎登入八鸽栈">
+      <template #footer>
+        <a-button class="login-btn" type="primary" :loading="loading" @click="handlerLogin" >登入</a-button>
+      </template>
+      <a-form :model="login" :label-col="{span:6}" :wrapper-col="wrapperCol">
+
+        <a-form-item label="登入名">
+          <a-input v-model:value="login.loginName"  style="width: 200px;" placeholder="请输入登入名" />
+        </a-form-item>
+        <a-form-item label="密码" >
+          <a-input-password v-model:value="login.password" style="width: 200px;" placeholder="请输入密码" />
+        </a-form-item>
+
+      </a-form>
+    </a-modal>
   </a-layout-header>
+
 
 </template>
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-
+import {defineComponent, ref} from 'vue';
+import {userLogin} from "@/api/user";
+import {message} from "ant-design-vue";
+declare let hexMd5: any;
+declare let KEY: any;
 export default defineComponent({
-  name: 'the-header'
+  name: 'the-header',
+  setup(){
+    const loading = ref(false);
+    const loginModalVisible = ref(false);
+    const login = ref();
+    const resetLogin = () => {
+      login.value = {
+        loginName : '',
+        password:''
+      }
+    }
+    resetLogin();
+    const handlerLogin = () =>{
+      resetLogin();
+      login.value.password = hexMd5 (login.value.password + KEY);
+      loading.value = true;
+      userLogin(login.value).then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          message.success(data.msg);
+          loginModalVisible.value = false;
+        } else {
+          message.error(data.msg);
+        }
+        loading.value = false;
+      })
+    }
+
+    return {
+      loading,
+      loginModalVisible,
+      login,
+      handlerLogin
+    }
+
+  }
 });
 </script>
 
-<style>
+<style scoped>
+.login-menu{
+  margin-top: 15px;
+  margin-right: 30px;
+  float: right;
+  color: white;
+}
+.login-btn{
+  display:block;
+  margin:0 auto;
+  width: 200px;
+}
 
 </style>

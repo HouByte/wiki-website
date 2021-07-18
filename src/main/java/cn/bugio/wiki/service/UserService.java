@@ -1,10 +1,7 @@
 package cn.bugio.wiki.service;
 
 import cn.bugio.wiki.common.CommonResult;
-import cn.bugio.wiki.domain.dto.UserReq;
-import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
-import cn.bugio.wiki.domain.dto.UserResp;
-import cn.bugio.wiki.domain.dto.UserSearchReq;
+import cn.bugio.wiki.domain.dto.*;
 import cn.bugio.wiki.domain.entity.User;
 
 import java.util.List;
@@ -41,10 +38,10 @@ public interface UserService {
 
     /**
      * 保存电子书
-     * @param userReq 保存数据
+     * @param userSaveReq 保存数据
      * @return
      */
-    CommonResult save(UserReq userReq);
+    CommonResult save(UserSaveReq userSaveReq);
 
     /**
      * 删除电子书
@@ -59,4 +56,11 @@ public interface UserService {
      * @return
      */
     CommonResult resetPassword(UserResetPasswordReq userResetPasswordReq);
+
+    /**
+     * 用户登入
+     * @param userLoginReq 用户登入请求参数
+     * @return
+     */
+    UserLoginResp login(UserLoginReq userLoginReq);
 }

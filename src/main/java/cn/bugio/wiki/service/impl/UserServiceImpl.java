@@ -2,17 +2,16 @@ package cn.bugio.wiki.service.impl;
 
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.dao.UserMapper;
-import cn.bugio.wiki.domain.dto.UserReq;
-import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
-import cn.bugio.wiki.domain.dto.UserResp;
-import cn.bugio.wiki.domain.dto.UserSearchReq;
+import cn.bugio.wiki.domain.dto.*;
 import cn.bugio.wiki.domain.entity.User;
 import cn.bugio.wiki.exception.BusinessException;
 import cn.bugio.wiki.exception.BusinessExceptionCode;
 import cn.bugio.wiki.service.UserService;
 import cn.bugio.wiki.util.CopyUtil;
 import cn.bugio.wiki.util.SnowFlake;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +27,7 @@ import java.util.List;
  * @author: Vincent Vic
  * @since: 2021/06/27
  */
+@Slf4j
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
@@ -77,18 +77,18 @@ public class UserServiceImpl implements UserService {
     /**
      * 保存电子书
      *
-     * @param userReq 保存数据
+     * @param userSaveReq 保存数据
      * @return
      */
     @Override
-    public CommonResult save(UserReq userReq) {
-        if (userReq == null){
+    public CommonResult save(UserSaveReq userSaveReq) {
+        if (userSaveReq == null){
             return CommonResult.error("参数不能为空");
         }
         //登入名称和邮箱必须唯一
-        checkUserUnique(userReq);
-        User user = CopyUtil.copy(userReq, User.class);
-        String md5Password = DigestUtils.md5Hex(userReq.getPassword());
+        checkUserUnique(userSaveReq);
+        User user = CopyUtil.copy(userSaveReq, User.class);
+        String md5Password = DigestUtils.md5Hex(userSaveReq.getPassword());
         user.setPassword(md5Password);
         int op = 0;
         //id为空为新增
@@ -111,14 +111,14 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 登入名称不存在检查
-     * @param userReq
+     * @param userSaveReq
      * @return
      */
-    private void checkUserUnique(UserReq userReq) {
-        if (userReq.getId() == null && null != selectUserByLoginName(userReq.getLoginName())){
+    private void checkUserUnique(UserSaveReq userSaveReq) {
+        if (userSaveReq.getId() == null && null != selectUserByLoginName(userSaveReq.getLoginName())){
             throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
         }
-        if (userReq.getId() == null && null != selectUserByEmail(userReq.getEmail())){
+        if (userSaveReq.getId() == null && null != selectUserByEmail(userSaveReq.getEmail())){
             throw new BusinessException(BusinessExceptionCode.USER_EMAIL_EXIST);
         }
     }
@@ -180,6 +180,30 @@ public class UserServiceImpl implements UserService {
             return CommonResult.error("密码更新失败");
         }
         return CommonResult.success("密码更新成功");
+    }
+
+    /**
+     * 用户登入
+     *
+     * @param userLoginReq 用户登入请求参数
+     * @return
+     */
+    @Override
+    public UserLoginResp login(UserLoginReq userLoginReq) {
+        Example example = new Example(User.class);
+        example.createCriteria().andEqualTo("loginName",userLoginReq.getLoginName());
+        User user = userMapper.selectOneByExample(example);
+        if (ObjectUtils.isEmpty(user)){
+            log.info("{} 用户不存在",userLoginReq.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        }
+        String password = DigestUtils.md5Hex(userLoginReq.getPassword());
+        if (!user.getPassword().equals(password)){
+            log.info("{} 用户密码错误",userLoginReq.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        }
+        UserLoginResp loginResp = CopyUtil.copy(user, UserLoginResp.class);
+        return loginResp;
     }
 
 

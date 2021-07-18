@@ -226,7 +226,6 @@ export default defineComponent({
       let save = Tool.copy(curUser.value);
       save.password = hexMd5 ((curUser.value.password === undefined ? 'NoChangePassword1':curUser.value.password) + KEY);
       Loading.value = true;
-      let response ;
       userSave(save).then((res) => {
         const data = res.data;
         if (data.code === 0) {
