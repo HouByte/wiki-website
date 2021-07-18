@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class UserLoginResp {
+public class UserLoginResp  implements Serializable {
     /**
      *  ID
      */
@@ -41,5 +42,10 @@ public class UserLoginResp {
      * 是否可用 0 不可用 1 可用 数据库默认0
      */
     private Boolean enable;
+
+    /**
+     * 登入口令
+     */
+    private String token;
 
 }

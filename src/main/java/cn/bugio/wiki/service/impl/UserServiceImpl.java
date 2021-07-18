@@ -14,11 +14,14 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <h1></h1>
@@ -35,10 +38,12 @@ public class UserServiceImpl implements UserService {
 
     private final SnowFlake snowFlake;
 
+    private final RedisTemplate redisTemplate;
     @Autowired
-    public UserServiceImpl(UserMapper userMapper, SnowFlake snowFlake) {
+    public UserServiceImpl(UserMapper userMapper, SnowFlake snowFlake, RedisTemplate redisTemplate) {
         this.userMapper = userMapper;
         this.snowFlake = snowFlake;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -189,7 +194,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public UserLoginResp login(UserLoginReq userLoginReq) {
+    public CommonResult login(UserLoginReq userLoginReq) {
         Example example = new Example(User.class);
         example.createCriteria().andEqualTo("loginName",userLoginReq.getLoginName());
         User user = userMapper.selectOneByExample(example);
@@ -203,7 +208,25 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
         }
         UserLoginResp loginResp = CopyUtil.copy(user, UserLoginResp.class);
-        return loginResp;
+        String token = UUID.randomUUID().toString().replace("-", "");
+        loginResp.setToken(token);
+        String tokenKey = String.format("USER_TOKEN_%s",token);
+        redisTemplate.opsForValue().set(tokenKey,loginResp,3600 * 12, TimeUnit.SECONDS);
+
+        return CommonResult.success(loginResp);
+    }
+
+    /**
+     * 用户登出
+     *
+     * @param token 口令
+     * @return
+     */
+    @Override
+    public CommonResult logout(String token) {
+        String tokenKey = String.format("USER_TOKEN_%s",token);
+        redisTemplate.delete(tokenKey);
+        return CommonResult.success("退出成功");
     }
 
 

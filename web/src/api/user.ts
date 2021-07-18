@@ -9,3 +9,5 @@ export const userResetPassword =(data: any) => request.post('/user/reset-passwor
 export const userDel =(id:number) => request.delete('/user/delete/'+id);
 
 export const userLogin =(data: any) => request.post('/user/login',data)
+
+export const userLogout =(token: any) => request.post('/user/logout/'+token)

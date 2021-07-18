@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,11 +24,13 @@ public class CategoryReq {
     /**
      * 父id
      */
+    @NotEmpty(message = "【父分类】不能为空")
     private Long parent;
 
     /**
      * 名称
      */
+    @NotEmpty(message = "【分类】不能为空")
     private String name;
 
     /**

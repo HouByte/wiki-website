@@ -44,8 +44,14 @@ public class UserController {
 
     @PostMapping("login")
     public CommonResult login(@Valid @RequestBody UserLoginReq userLoginReq){
-        UserLoginResp login = userService.login(userLoginReq);
-        return CommonResult.success(login);
+        return userService.login(userLoginReq);
+    }
+
+
+
+    @PostMapping("logout/{token}")
+    public CommonResult logout(@PathVariable("token") String token){
+        return userService.logout(token);
     }
 
     @DeleteMapping("delete/{id}")

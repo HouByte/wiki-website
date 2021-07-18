@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +24,7 @@ public class EbookReq {
     /**
      * 名称
      */
-    @NotNull(message = "名称不能为空")
+    @NotEmpty(message = "名称不能为空")
     private String name;
 
     /**

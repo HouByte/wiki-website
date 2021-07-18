@@ -62,5 +62,12 @@ public interface UserService {
      * @param userLoginReq 用户登入请求参数
      * @return
      */
-    UserLoginResp login(UserLoginReq userLoginReq);
+    CommonResult login(UserLoginReq userLoginReq);
+
+    /**
+     * 用户登出
+     * @param token 口令
+     * @return
+     */
+    CommonResult logout(String token);
 }

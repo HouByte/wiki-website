@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
@@ -20,42 +21,40 @@ public class DocReq {
     /**
      *  电子书id
      */
-    @NotNull(message = "电子书对应不能为空")
+    @NotEmpty(message = "【电子书】对应不能为空")
     private Long ebookId;
 
     /**
      *  父id 
      */
-    @NotNull(message = "父文档不能为空")
+    @NotEmpty(message = "【父文档】不能为空")
     private Long parent;
 
     /**
      *  名称
      */
-    @NotNull(message = "名称不能为空")
+    @NotEmpty(message = "【名称】不能为空")
     private String name;
 
     /**
      *  顺序
      */
-    @NotNull(message = "顺序不能为空")
+    @NotEmpty(message = "【顺序】不能为空")
     private Integer sort;
 
     /**
      * 内容
      */
-    @NotNull(message = "内容不能为空")
+    @NotEmpty(message = "【内容】不能为空")
     private String content;
 
     /**
      * 阅读数
      */
-    @Column(name = "view_count")
     private Integer viewCount;
 
     /**
      *  点赞数
      */
-    @Column(name = "vote_count")
     private Integer voteCount;
 }
