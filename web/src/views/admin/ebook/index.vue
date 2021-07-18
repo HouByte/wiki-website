@@ -21,7 +21,7 @@
         </template>
         <template #customTitle>
           <span>
-            电子书名称
+            专栏名称
           </span>
         </template>
         <template #categoryIdList="{ text: categoryIdList }">

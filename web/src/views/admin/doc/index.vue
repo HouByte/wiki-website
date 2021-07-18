@@ -166,7 +166,7 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value,0);
           // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
-          treeSelectData.value = Tool.copy(level1.value);
+          treeSelectData.value = Tool.copy(level1.value) || [];
           // 为选择树添加一个"无"
           treeSelectData.value.unshift({id: 0, name: '无'});
         } else {

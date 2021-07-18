@@ -219,7 +219,11 @@ export default defineComponent({
 .wangeditor ul, ol {
   margin: 10px 0 10px 20px;
 }
-
+/* 富文本图片自适应 */
+.wangeditor img {
+  max-width: 100%;
+  height: auto;
+}
 .ant-statistic-content-value-int {
   font-size: 12px !important;
 }

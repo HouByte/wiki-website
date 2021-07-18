@@ -109,7 +109,7 @@ const getList = () => {
     if (data.code === 0) {
       categorys.value = data.data;
       level1.value = [];
-      level1.value = Tool.array2Tree(categorys.value,0);
+      level1.value = Tool.array2Tree(categorys.value,0) || [];
       console.log(level1.value);
     } else {
       message.error(data.msg);

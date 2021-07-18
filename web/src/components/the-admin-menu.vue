@@ -14,10 +14,10 @@
         <template #title>
               <span>
                 <user-outlined/>
-                Wiki管理
+                知识库管理
               </span>
         </template>
-        <a-menu-item key="1"><router-link to="/admin/ebook">知识库管理</router-link></a-menu-item>
+        <a-menu-item key="1"><router-link to="/admin/ebook">专栏管理</router-link></a-menu-item>
         <a-menu-item key="2"><router-link to="/admin/category">分类管理</router-link></a-menu-item>
       </a-sub-menu>
       <a-sub-menu key="sub2">
