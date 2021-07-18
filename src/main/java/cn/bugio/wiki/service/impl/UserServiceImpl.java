@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.isNotEmpty(searchReq.getKeyword())){
                 String keyword = searchReq.getKeyword();
                 keyword = "%"+keyword+"%";
-                example.createCriteria().andLike("name",keyword).orLike("desc",keyword);
+                example.createCriteria().andLike("name",keyword).orLike("loginName",keyword);
             }
             if (searchReq.getCategoryId() != null && searchReq.getCategoryId() != 0){
                 Long categoryId = searchReq.getCategoryId();

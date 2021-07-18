@@ -8,10 +8,10 @@
 
       <p>
         <a-input-search
-            v-model:value="value"
-            placeholder="书名"
+            v-model:value="keyword"
+            placeholder="专栏名称"
             style="width: 200px"
-            @search="onSearch"
+            @search="onSearch(keyword)"
         />
         <a-button type="primary" style="margin-left: 10px;" @click="showAdd">添加</a-button>
       </p>
@@ -61,6 +61,25 @@
     </a-layout-content>
 
   </a-layout>
+
+  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
+    <a-form :model="curEbook" :label-col="{span:4}" :wrapper-col="wrapperCol">
+      <a-form-item label="封面">
+        <a-input v-model:value="curEbook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="curEbook.name" />
+      </a-form-item>
+      <a-form-item label="分类">
+        <a-cascader v-model:value="curEbook.categoryIdList" :options="categorys" :field-names="{label:'name',value:'id',children:'children'}" placeholder="Please select" />
+      </a-form-item>
+
+      <a-form-item label="描述">
+        <a-input v-model:value="curEbook.desc" type="textarea" />
+      </a-form-item>
+
+    </a-form>
+  </a-modal>
 
   <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
     <a-form :model="curEbook" :label-col="{span:4}" :wrapper-col="wrapperCol">
@@ -152,22 +171,7 @@ const columns = [
     slots: {customRender: 'action'},
   },
 ];
-const Loading = ref();
-const ebooks = ref();
-const getList = () => {
-  // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
-  ebooks.value = [];
-  ebookList().then((res) => {
-    const data = res.data;
-    if (data.code === 0) {
-      ebooks.value = data.data;
-      console.log(ebooks);
-    } else {
-      message.error(data.msg);
-    }
-    Loading.value = false;
-  })
-}
+
 
 
 
@@ -176,8 +180,21 @@ export default defineComponent({
     TheAdminMenu
   },
   setup() {
-
-    Loading.value = true;
+    const Loading = ref(true);
+    const ebooks = ref();
+    //查询
+    const onSearch = (keyword:any) => {
+      ebookSearch(keyword,0).then((res) => {
+        const data = res.data;
+        if (data.code === 0) {
+          ebooks.value = data.data;
+          console.log(ebooks);
+        } else {
+          message.error(data.msg);
+        }
+        Loading.value = false;
+      })
+    }
     const categorys = ref();
     let categoryIds:any;
     const getCategorysList = () => {
@@ -210,23 +227,10 @@ export default defineComponent({
     //启动执行
     onMounted(() => {
       console.log("x")
-      getList();
+      onSearch(null);
       getCategorysList();
-      console.log("fl ",categorys)
     })
-    //查询
-    const onSearch = (keyword:any) => {
-      ebookSearch(keyword,0).then((res) => {
-        const data = res.data;
-        if (data.code === 0) {
-          ebooks.value = data.data;
-          console.log(ebooks);
-        } else {
-          message.error(data.msg);
-        }
-        Loading.value = false;
-      })
-    }
+
     //分页
     const pagination = {
       onChange: (page: number) => {
@@ -263,7 +267,7 @@ export default defineComponent({
         } else {
           message.error(data.msg);
         }
-        getList();
+        onSearch(null);
         Loading.value = false;
       })
 
@@ -278,15 +282,10 @@ export default defineComponent({
         } else {
           message.error(data.msg);
         }
-        getList();
+        onSearch(null);
         Loading.value = false;
       })
     }
-
-
-    // const handleChange = (value: string) => {
-    //   console.log(`selected ${value}`);
-    // };
 
 
 
@@ -305,10 +304,9 @@ export default defineComponent({
       handleDelete,
       modalTitle,
       curEbook,
-      getList,
       categorys,
       getCategoryName,
-      value: ref<string[]>([]),
+      keyword:ref(null),
     };
   },
 

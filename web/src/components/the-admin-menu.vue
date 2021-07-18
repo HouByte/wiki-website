@@ -27,7 +27,7 @@
                 系统管理
               </span>
         </template>
-        <a-menu-item key="5">用户管理</a-menu-item>
+        <a-menu-item key="5"><router-link to="/admin/user">用户管理</router-link></a-menu-item>
         <a-menu-item key="6">首页管理</a-menu-item>
       </a-sub-menu>
 
