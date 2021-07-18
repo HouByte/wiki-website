@@ -41,6 +41,14 @@ public class UserReq {
     private String password;
 
     /**
+     * 邮箱
+     */
+    @NotNull(message = "【邮箱】不能为空")
+    @Length(min = 6, max = 50, message = "【邮箱】6~50位")
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", message = "【邮箱】非法邮箱")
+    private String email;
+
+    /**
      * 头像
      */
     private String avatar;
