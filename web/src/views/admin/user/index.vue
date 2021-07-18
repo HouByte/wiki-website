@@ -48,7 +48,7 @@
             cancel-text="否"
             @confirm="showEdit(record)"
         >
-            <a-button type="primary" >{{record.enable ? '禁用':'启用'}}</a-button>
+            <a-button type="primary" style="margin-right: 10px;margin-bottom: 1px;margin-top: 1px;">{{record.enable ? '禁用':'启用'}}</a-button>
           </a-popconfirm>
 
         <a-popconfirm
@@ -57,7 +57,7 @@
             cancel-text="否"
             @confirm="handleDelete(record.id)"
         >
-            <a-button type="primary" style="margin-left: 10px;">删除</a-button>
+            <a-button type="primary">删除</a-button>
           </a-popconfirm>
       </span>
         </template>
@@ -73,23 +73,23 @@
         <a-input v-model:value="curUser.avatar" />
       </a-form-item>
       <a-form-item label="登入名">
-        <a-input v-model:value="curUser.loginName" :disabled="modalTitle === '编辑' ? true:false"/>
+        <a-input v-model:value="curUser.loginName" :disabled="curUser.id" placeholder="请输入登入名"/>
       </a-form-item>
 
       <a-form-item label="昵称">
-        <a-input v-model:value="curUser.name" />
+        <a-input v-model:value="curUser.name" placeholder="请输入昵称"/>
       </a-form-item>
       <a-form-item label="邮箱">
-        <a-input v-model:value="curUser.email" />
+        <a-input v-model:value="curUser.email" placeholder="请输入邮箱"/>
       </a-form-item>
-      <a-form-item label="修改密码" v-show="modalTitle === '编辑' ? true:false">
-        <a-switch v-model:checked="isUpdatePass">
+      <a-form-item label="修改密码" v-show="curUser.id">
+        <a-switch v-model:checked="isUpdatePass" >
           <template #checkedChildren><check-outlined /></template>
           <template #unCheckedChildren><close-outlined /></template>
         </a-switch>
       </a-form-item>
       <a-form-item label="密码" v-show="isUpdatePass">
-        <a-input v-model:value="curUser.password" />
+        <a-input-password v-model:value="curUser.password" placeholder="请输入密码" />
       </a-form-item>
 
     </a-form>
@@ -99,12 +99,14 @@
 
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
-import {userDel, userSave, userSearch} from "@/api/user";
+import {userDel, userResetPassword, userSave, userSearch} from "@/api/user";
 import {message} from "ant-design-vue";
 import moment from 'moment'
 import {Tool} from "@/util/tool";
 import TheAdminMenu from '@/components/the-admin-menu.vue';
-import {categoryList} from "@/api/category";
+declare let hexMd5: any;
+declare let KEY: any;
+
 const columns = [
   {
     title: '头像',
@@ -221,18 +223,43 @@ export default defineComponent({
 
     const handleEditOk = (e: MouseEvent) => {
       visible.value = false;
-      console.log("保存/更新",curUser.value)
-      userSave(curUser.value).then((res) => {
+      let save = Tool.copy(curUser.value);
+      save.password = hexMd5 ((curUser.value.password === undefined ? 'NoChangePassword1':curUser.value.password) + KEY);
+      Loading.value = true;
+      let response ;
+      userSave(save).then((res) => {
         const data = res.data;
         if (data.code === 0) {
-          users.value = data.data;
           message.success(data.msg);
+          onSearch(null);
         } else {
           message.error(data.msg);
         }
-        onSearch(null);
         Loading.value = false;
       })
+
+      if (!isUpdatePass.value){
+
+        return true;
+      }
+      console.log("test")
+      let resetPassword = {
+        id:save.id,
+        password:save.password
+      }
+      Loading.value = true;
+      userResetPassword(resetPassword).then((res)=>{
+        const data = res.data;
+        if (data.code === 0) {
+          message.success(data.msg);
+          onSearch(null);
+        } else {
+          message.error(data.msg);
+        }
+        Loading.value = false;
+      })
+
+
 
     };
 

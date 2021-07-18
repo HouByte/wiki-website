@@ -3,13 +3,15 @@ package cn.bugio.wiki.service.impl;
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.dao.UserMapper;
 import cn.bugio.wiki.domain.dto.UserReq;
+import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
 import cn.bugio.wiki.domain.dto.UserResp;
 import cn.bugio.wiki.domain.dto.UserSearchReq;
 import cn.bugio.wiki.domain.entity.User;
+import cn.bugio.wiki.exception.BusinessException;
+import cn.bugio.wiki.exception.BusinessExceptionCode;
 import cn.bugio.wiki.service.UserService;
 import cn.bugio.wiki.util.CopyUtil;
 import cn.bugio.wiki.util.SnowFlake;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -84,6 +85,8 @@ public class UserServiceImpl implements UserService {
         if (userReq == null){
             return CommonResult.error("参数不能为空");
         }
+        //登入名称和邮箱必须唯一
+        checkUserUnique(userReq);
         User user = CopyUtil.copy(userReq, User.class);
         String md5Password = DigestUtils.md5Hex(userReq.getPassword());
         user.setPassword(md5Password);
@@ -94,7 +97,8 @@ public class UserServiceImpl implements UserService {
             user.setCreated(new Date());
             user.setUpdated(new Date());
             op = userMapper.insertSelective(user);
-        } else{
+        } else{ //修改
+            user.setLoginName(null);
             user.setPassword(null);
             user.setUpdated(new Date());
             op = userMapper.updateByPrimaryKeySelective(user);
@@ -103,6 +107,44 @@ public class UserServiceImpl implements UserService {
             return CommonResult.error("保存失败");
         }
         return CommonResult.success("保存成功");
+    }
+
+    /**
+     * 登入名称不存在检查
+     * @param userReq
+     * @return
+     */
+    private void checkUserUnique(UserReq userReq) {
+        if (userReq.getId() == null && null != selectUserByLoginName(userReq.getLoginName())){
+            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+        }
+        if (userReq.getId() == null && null != selectUserByEmail(userReq.getEmail())){
+            throw new BusinessException(BusinessExceptionCode.USER_EMAIL_EXIST);
+        }
+    }
+
+    /**
+     * 根据登入名查询用户
+     * @param loginName 登入名
+     * @return
+     */
+    @Override
+    public User selectUserByLoginName(String loginName) {
+        Example example = new Example(User.class);
+        example.createCriteria().andEqualTo("loginName", loginName);
+        return userMapper.selectOneByExample(example);
+    }
+
+    /**
+     * 根据邮箱查询用户
+     * @param email 邮箱
+     * @return
+     */
+    @Override
+    public User selectUserByEmail(String email) {
+        Example example = new Example(User.class);
+        example.createCriteria().andEqualTo("email", email);
+        return userMapper.selectOneByExample(example);
     }
 
     /**
@@ -118,6 +160,26 @@ public class UserServiceImpl implements UserService {
             return CommonResult.error("删除失败");
         }
         return CommonResult.success("删除成功");
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param userResetPasswordReq
+     * @return
+     */
+    @Override
+    public CommonResult resetPassword(UserResetPasswordReq userResetPasswordReq) {
+        User user = userMapper.selectByPrimaryKey(userResetPasswordReq.getId());
+        if (user == null){
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_NOT_FOUND);
+        }
+        String newPassword = DigestUtils.md5Hex(userResetPasswordReq.getPassword());
+        int update = userMapper.updateByPrimaryKeySelective(User.builder().id(user.getId()).password(newPassword).build());
+        if (update == 0){
+            return CommonResult.error("密码更新失败");
+        }
+        return CommonResult.success("密码更新成功");
     }
 
 

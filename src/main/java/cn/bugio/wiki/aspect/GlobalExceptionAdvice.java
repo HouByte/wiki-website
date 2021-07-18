@@ -3,6 +3,7 @@ package cn.bugio.wiki.aspect;
 
 
 import cn.bugio.wiki.common.CommonResult;
+import cn.bugio.wiki.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,7 +25,15 @@ public class GlobalExceptionAdvice {
     public CommonResult<String> handlerException(HttpServletRequest req,
                                                  Exception ex) {
         log.error("{} 捕获到异常 ==> {}",req,ex);
-        CommonResult<String> response = CommonResult.errorException(ex.getMessage(),ex.getLocalizedMessage());
+        CommonResult<String> response = CommonResult.errorException("系统出现故障，请联系管理员");
+        return response;
+    }
+
+    @ExceptionHandler(value = BusinessException.class)
+    public CommonResult<String> handlerBindException(HttpServletRequest req,
+                                                     BusinessException ex) {
+        log.error("{}  业务异常 ==> {}",req,ex);
+        CommonResult<String> response = CommonResult.errorException(ex.getCode().getDesc());
         return response;
     }
 

@@ -2,6 +2,7 @@ package cn.bugio.wiki.controller;
 
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.domain.dto.UserReq;
+import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
 import cn.bugio.wiki.domain.dto.UserResp;
 import cn.bugio.wiki.domain.dto.UserSearchReq;
 import cn.bugio.wiki.service.UserService;
@@ -37,6 +38,10 @@ public class UserController {
     @PostMapping("save")
     public CommonResult save(@Valid @RequestBody UserReq userReq){
         return userService.save(userReq);
+    }
+    @PostMapping("reset-password")
+    public CommonResult resetPassword(@Valid @RequestBody UserResetPasswordReq userResetPasswordReq){
+        return userService.resetPassword(userResetPasswordReq);
     }
 
     @DeleteMapping("delete/{id}")

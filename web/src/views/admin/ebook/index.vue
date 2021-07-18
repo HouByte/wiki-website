@@ -87,14 +87,14 @@
         <a-input v-model:value="curEbook.cover" />
       </a-form-item>
       <a-form-item label="名称">
-        <a-input v-model:value="curEbook.name" />
+        <a-input v-model:value="curEbook.name" placeholder="请输入名称"/>
       </a-form-item>
       <a-form-item label="分类">
         <a-cascader v-model:value="curEbook.categoryIdList" :options="categorys" :field-names="{label:'name',value:'id',children:'children'}" placeholder="Please select" />
       </a-form-item>
 
       <a-form-item label="描述">
-        <a-input v-model:value="curEbook.desc" type="textarea" />
+        <a-input v-model:value="curEbook.desc" type="textarea" placeholder="请填写描述"/>
       </a-form-item>
 
     </a-form>

@@ -2,8 +2,10 @@ package cn.bugio.wiki.service;
 
 import cn.bugio.wiki.common.CommonResult;
 import cn.bugio.wiki.domain.dto.UserReq;
+import cn.bugio.wiki.domain.dto.UserResetPasswordReq;
 import cn.bugio.wiki.domain.dto.UserResp;
 import cn.bugio.wiki.domain.dto.UserSearchReq;
+import cn.bugio.wiki.domain.entity.User;
 
 import java.util.List;
 
@@ -15,6 +17,20 @@ import java.util.List;
  * @since: 2021/06/27
  */
 public interface UserService {
+
+    /**
+     * 根据登入名查询用户
+     * @param loginName 登入名
+     * @return
+     */
+    public User selectUserByLoginName(String loginName);
+
+    /**
+     * 根据邮箱查询用户
+     * @param email 邮箱
+     * @return
+     */
+    public User selectUserByEmail(String email);
 
     /**
      * <h2>查询列表</h2>
@@ -37,4 +53,10 @@ public interface UserService {
      */
     CommonResult delete(Long id);
 
+    /**
+     * 修改密码
+     * @param userResetPasswordReq
+     * @return
+     */
+    CommonResult resetPassword(UserResetPasswordReq userResetPasswordReq);
 }
