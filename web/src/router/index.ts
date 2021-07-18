@@ -11,6 +11,8 @@ import User from '@/views/admin/user/index.vue'
 import {Tool} from "@/util/tool";
 import store from "@/store";
 import {message} from "ant-design-vue";
+import NotAuthorized from "@/views/403.vue";
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -71,6 +73,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/doc',
     name: 'Doc',
     component: Doc
+  },
+  {
+    path: '/403',
+    name: '403',
+    component: NotAuthorized
   }
 ]
 
@@ -88,8 +95,7 @@ router.beforeEach((to, from, next) => {
   })) {
     const loginUser = store.state.user;
     if (Tool.isEmpty(loginUser)) {
-     message.error("未登入不能访问");
-      next('/');
+      next('/403');
     } else {
       next();
     }
