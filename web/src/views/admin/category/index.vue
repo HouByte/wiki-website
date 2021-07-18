@@ -46,7 +46,7 @@
 
   </a-layout>
 
-  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
+  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk" ok-text="确认" cancel-text="取消">
     <a-form :model="curCategory" :label-col="{span:4}" :wrapper-col="wrapperCol">
       <a-form-item label="名称">
         <a-input v-model:value="curCategory.name" />

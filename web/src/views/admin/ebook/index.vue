@@ -81,7 +81,7 @@
     </a-form>
   </a-modal>
 
-  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk">
+  <a-modal v-model:visible="visible" :title="modalTitle" @ok="handleEditOk" ok-text="确认" cancel-text="取消">
     <a-form :model="curEbook" :label-col="{span:4}" :wrapper-col="wrapperCol">
       <a-form-item label="封面">
         <a-input v-model:value="curEbook.cover" />
