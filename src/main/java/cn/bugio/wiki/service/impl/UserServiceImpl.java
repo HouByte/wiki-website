@@ -229,5 +229,21 @@ public class UserServiceImpl implements UserService {
         return CommonResult.success("退出成功");
     }
 
+    /**
+     * 修改用户状态
+     *
+     * @param id     用户id
+     * @param enable 状态
+     * @return
+     */
+    @Override
+    public CommonResult updateEnable(Long id, Boolean enable) {
+        int update = userMapper.updateByPrimaryKeySelective(User.builder().id(id).enable(enable).build());
+        if (update == 0){
+            return CommonResult.error("更新失败");
+        }
+        return CommonResult.success("更新成功");
+    }
+
 
 }

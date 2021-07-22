@@ -70,4 +70,12 @@ public interface UserService {
      * @return
      */
     CommonResult logout(String token);
+
+    /**
+     * 修改用户状态
+     * @param id 用户id
+     * @param enable 状态
+     * @return
+     */
+    CommonResult updateEnable(Long id, Boolean enable);
 }

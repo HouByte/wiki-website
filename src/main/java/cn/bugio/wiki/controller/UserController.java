@@ -58,4 +58,9 @@ public class UserController {
     public CommonResult delete(@PathVariable("id") Long id){
         return userService.delete(id);
     }
+
+    @PostMapping("update/enable/{id}")
+    public CommonResult updateEnable(@PathVariable("id") Long id,@RequestBody UserUpdateEnableReq userUpdateEnableReq){
+        return userService.updateEnable(id,userUpdateEnableReq.getEnable());
+    }
 }
