@@ -207,6 +207,11 @@ public class UserServiceImpl implements UserService {
             log.info("{} 用户密码错误",userLoginReq.getLoginName());
             throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
         }
+        //判断是否可用
+        if (!user.getEnable()){
+            log.info("{} 用户被禁止使用",userLoginReq.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.USER_DISABLED);
+        }
         UserLoginResp loginResp = CopyUtil.copy(user, UserLoginResp.class);
         String token = UUID.randomUUID().toString().replace("-", "");
         loginResp.setToken(token);
