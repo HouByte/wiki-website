@@ -46,7 +46,7 @@
             :title="'是否确定'+ (record.enable ? '禁用':'启用')"
             ok-text="是"
             cancel-text="否"
-            @confirm="showEdit(record)"
+            @confirm="handleUpdateEnable(record.id,!record.enable)"
         >
             <a-button type="primary" style="margin-right: 10px;margin-bottom: 1px;margin-top: 1px;">{{record.enable ? '禁用':'启用'}}</a-button>
           </a-popconfirm>
@@ -99,7 +99,7 @@
 
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
-import {userDel, userResetPassword, userSave, userSearch} from "@/api/user";
+import {userDel, userResetPassword, userSave, userSearch, userUpdateEnable} from "@/api/user";
 import {message} from "ant-design-vue";
 import moment from 'moment'
 import {Tool} from "@/util/tool";
@@ -276,6 +276,17 @@ export default defineComponent({
       })
     }
 
+    const handleUpdateEnable = (id:number,enable:boolean) =>{
+      userUpdateEnable(id,enable).then((res)=>{
+        const data = res.data;
+        if (data.code === 0) {
+          message.success(data.msg);
+        } else {
+          message.error(data.msg);
+        }
+        onSearch(null);
+      })
+    }
     
 
 
@@ -297,6 +308,7 @@ export default defineComponent({
       modalTitle,
       curUser,
       keyword:ref(null),
+      handleUpdateEnable
     };
   },
 
