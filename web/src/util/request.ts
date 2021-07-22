@@ -10,7 +10,9 @@ declare let SessionStorage:any;
 service.interceptors.request.use(function(config:AxiosRequestConfig):AxiosRequestConfig {//config是请求时的配置信息。
     // 在发送请求之前做些什么
     // 设置请求头 携带token
-    const token:string | null = SessionStorage.get('USER').token||null;
+    const user:any | null = SessionStorage.get('USER')||null;
+    console.log("token",user)
+    const token:string | null = (user=== null ?null:user.token);
     if(token){
         config.headers = config.headers || {}
         config.headers['token'] = token
